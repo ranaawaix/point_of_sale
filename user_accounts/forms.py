@@ -1,0 +1,58 @@
+from django.core.exceptions import ValidationError
+
+from user_accounts.models import User
+from django import forms
+from django.contrib.auth.forms import AuthenticationForm
+
+
+class CreateUserForm(forms.ModelForm):
+    password1 = forms.CharField(label="Password")
+    password2 = forms.CharField(label="Password confirmation")
+
+    class Meta:
+        model = User
+        fields = ['group', 'first_name', 'last_name', 'phone', 'gender', 'email', 'username', 'password1', 'password2',
+                  'status', 'store']
+        widgets = {'group': forms.Select(attrs={'class': 'form-control', 'empty_label': '---Please Select---'}),
+                   'first_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter First Name...'}),
+                   'last_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter Last Name...'}),
+                   'phone': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Enter Phone Number...'}),
+                   'gender': forms.Select(attrs={'class': 'form-control', 'empty_label': '---Please Select---'}),
+                   'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Enter Email...'}),
+                   'username': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter Username...'}),
+                   'status': forms.Select(attrs={'class': 'form-control', 'empty_label': '---Please Select---'}),
+                   'store': forms.Select(attrs={'class': 'form-control', 'empty_label': '---Please Select---'}), }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['password1'].widget.attrs['class'] = 'form-control'
+        self.fields['password1'].widget.attrs['placeholder'] = 'Enter a password...'
+        self.fields['password2'].widget.attrs['class'] = 'form-control'
+        self.fields['password2'].widget.attrs['placeholder'] = 'Enter password again...'
+
+    def clean_password2(self):
+        # Check that the two password entries match
+        password1 = self.cleaned_data.get("password1")
+        password2 = self.cleaned_data.get("password2")
+        if password1 and password2 and password1 != password2:
+            raise ValidationError("Passwords don't match")
+        return password2
+
+    def save(self, commit=True):
+        # Save the provided password in hashed format
+        user = super().save(commit=False)
+        user.set_password(self.cleaned_data["password1"])
+        if commit:
+            user.save()
+        return user
+
+
+class LoginForm(AuthenticationForm):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['username'].widget.attrs['class'] = 'form-control'
+        self.fields['username'].widget.attrs['placeholder'] = 'Enter your username...'
+        self.fields['password'].widget.attrs['class'] = 'form-control'
+        self.fields['password'].widget.attrs['placeholder'] = 'Enter your password...'

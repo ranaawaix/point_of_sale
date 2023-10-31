@@ -38,7 +38,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'users',
+    'user_accounts',
+    'inventory',
+    'POS',
+
+    'cities_light',
 ]
 
 MIDDLEWARE = [
@@ -79,8 +83,10 @@ WSGI_APPLICATION = 'point_of_sale.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'POS',
+        'USER': 'Rana',
+        'PASSWORD': 'Raw@1994',
     }
 }
 
@@ -130,3 +136,5 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+AUTH_USER_MODEL = 'user_accounts.User'

@@ -84,10 +84,11 @@
                    data-target=".bs-example-modal-sm">
                     <i class="fa fa-pause"></i> Hold
                 </a>
-                <a class="btn btn-app px-0" style="width:40%">
+                <a class="btn btn-app px-0" style="width:40%" data-toggle="modal"
+                   data-target="#modalOrder">
                     <i class="fa fa-print"></i> Print Order
                 </a>
-                <a class="btn btn-app px-0" style="width:40%">
+                <a class="btn btn-app px-0" style="width:40%" href="{% url 'list-sales' %}">
                     <i class="fa fa-close"></i> Cancel
                 </a>
                 <a class="btn btn-app px-0" style="width:40%">
@@ -189,6 +190,41 @@
         </div>
     </div>
 </div>
+<div id="modalOrder" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel2">Print Order</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true"><i class="fa fa-print"></i></span>
+                </button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="px-auto">
+                    <h3 class="text-center"><b>SimplePOS</b></h3>
+                    <h5 class="text-center"><b>Order</b></h5>
+                </div>
+                <h6><b>Client: </b> {{ sale.customer.name }}</h6>
+                <h6><b>Salesman: </b> {{ user.username|capfirst }}</h6>
+                <h6><b>Date: </b> {{ sale.created_at }}</h6>
+                <div class="row">
+                    {% for saleitem in sale.saleitems.all %}
+                        <div class="col-md-10 col-sm-10">
+                            {{ saleitem.product }}
+                        </div>
+                        <div class="col-md-2 col-sm-2">
+                            {{ saleitem.quantity }}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <div id="modalPayment" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" style="display: none;"
      aria-hidden="true">
     <div class="modal-dialog modal-lg">
@@ -285,12 +321,12 @@
     $(document).ready(function () {
         $('.holdForm').on('submit', function (e) {
             e.preventDefault();
-            var sale_id = $('#SaleID').data('slid');
-            var note = $(this).find('#id_reference_note').val();
+            let sale_id = $('#SaleID').data('slid');
+            let note = $(this).find('#id_reference_note').val();
             let csrf = $("input[name=csrfmiddlewaretoken]").val();
             let url = $('#SaleID').data('url');
             console.log(sale_id, note);
-            my_data = {sale_id: sale_id, note: note, csrfmiddlewaretoken: csrf}
+            let my_data = {sale_id: sale_id, note: note, csrfmiddlewaretoken: csrf}
             $.ajax({
                 url: url, method: 'POST', data: my_data, success: function (data) {
                     if (data.status === 'Saved') {
@@ -315,13 +351,13 @@
         });
         $('.customerForm').on('submit', function (e) {
             e.preventDefault();
-            var name = $(this).find('#id_name').val();
-            var email = $(this).find('#id_email').val();
-            var phone = $(this).find('#id_phone').val();
-            var custom_1 = $(this).find('#id_customer_custom_field_1').val();
-            var custom_2 = $(this).find('#id_customer_custom_field_2').val();
+            let name = $(this).find('#id_name').val();
+            let email = $(this).find('#id_email').val();
+            let phone = $(this).find('#id_phone').val();
+            let custom_1 = $(this).find('#id_customer_custom_field_1').val();
+            let custom_2 = $(this).find('#id_customer_custom_field_2').val();
             let csrf = $("input[name=csrfmiddlewaretoken]").val();
-            var sale_id = $('#SaleId').data('saleid');
+            let sale_id = $('#SaleId').data('saleid');
             let url = $('#SaleId').data('url');
             console.log(name, email, phone, custom_1, custom_2, sale_id);
             my_data = {
@@ -362,15 +398,15 @@
         });
         $('.paymentForm').on('submit', function (e) {
             e.preventDefault();
-            var sale_id = $('#saleId').data('sid');
+            let sale_id = $('#saleId').data('sid');
             let url = $('#Saleid').data('url');
-            var note = $(this).find('#id_note').val();
-            var amount = $(this).find('#id_amount').val();
-            var payment_by = $(this).find('#id_payment_by').val();
-            var payment_note = $(this).find('#id_payment_note').val();
+            let note = $(this).find('#id_note').val();
+            let amount = $(this).find('#id_amount').val();
+            let payment_by = $(this).find('#id_payment_by').val();
+            let payment_note = $(this).find('#id_payment_note').val();
             let csrf = $("input[name=csrfmiddlewaretoken]").val();
             console.log(note, amount, payment_by, payment_note, sale_id);
-            my_data = {
+            let my_data = {
                 sale_id: sale_id,
                 note: note,
                 amount: amount,
@@ -401,10 +437,10 @@
             });
         });
         $(".btn-group-vertical button").on("click", function () {
-            var buttonText = $(this).text();
-            var total_paying = $(this).val();
-            var total_payable = $('#totalPayable').data('tp');
-            var balance = total_paying - total_payable
+            let buttonText = $(this).text();
+            let total_paying = $(this).val();
+            let total_payable = $('#totalPayable').data('tp');
+            let balance = total_paying - total_payable
             console.log(total_paying, total_payable, balance);
             $('#totalPaying').html(buttonText);
             $('#id_amount').val(total_payable);
@@ -418,12 +454,12 @@
             $('#delete_saleitem a').on('click', function (e) {
                 e.preventDefault();
                 console.log('Open Prevented');
-                var sale_id = $('#saleId').data('sid');
-                var saleitem_id = $(this).data('sp');
+                let sale_id = $('#saleId').data('sid');
+                let saleitem_id = $(this).data('sp');
                 let url = $(this).data('url');
                 let csrf = $("input[name=csrfmiddlewaretoken]").val();
                 console.log(sale_id, saleitem_id);
-                var my_data = {sale_id: sale_id, saleitem_id: saleitem_id, csrfmiddlewaretoken: csrf}
+                let my_data = {sale_id: sale_id, saleitem_id: saleitem_id, csrfmiddlewaretoken: csrf}
                 $.ajax({
                     url: url, method: 'POST', data: my_data, success: function (rsp) {
                         console.log(rsp)

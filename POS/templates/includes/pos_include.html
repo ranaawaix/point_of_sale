@@ -1,0 +1,436 @@
+{% load static %}
+<div class="x_panel" style="height: 100%">
+    <div class="x_content">
+        <br/>
+        <form class="form-horizontal form-label-left" action="" method="POST" novalidate>
+            {% csrf_token %}
+            <div class="form-group row">
+                <div class="col-md-10 col-sm-10 col-xs-10 px-0">
+                    {{ form.customer }}
+                </div>
+                <div class="col-md-2 col-sm-2 col-xs-2 text-center">
+                    <button id="btnAddCustomer" type="button" class="btn btn-round btn-info" data-toggle="modal"
+                            data-target="#modalCustomer"><i class="fa fa-plus-circle"></i></button>
+                </div>
+            </div>
+            <div class="x_content min-vh-100">
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                        <th class="text-center">Product</th>
+                        <th class="text-center">Price</th>
+                        <th class="text-center">Quantity</th>
+                        <th class="text-center">Subtotal</th>
+                        <th class="text-center"><i class="fa fa-trash-o"></i></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for saleitem in sale.saleitems.all %}
+                        <input id="saleId" type="hidden" data-sid="{{ saleitem.sale.id }}">
+                        <tr>
+                            <td class="saleitem_name text-center">{{ saleitem.product.name }}</td>
+                            <td class="saleitem_price text-center">{{ saleitem.price }}</td>
+                            <td class="saleitem_quantity text-center">{{ saleitem.quantity }}</td>
+                            <td class="saleitem_subtotal text-center">{{ saleitem.total }}</td>
+                            <td id="delete_saleitem" class="saleitem_subtotal text-center"><a
+                                    data-url="{% url 'delete-saleitem' %}" href="#" data-sp="{{ saleitem.product.id }}"><i
+                                    class="fa fa-trash-o"></i></a></td>
+                        </tr>
+                    {% endfor %}
+
+                    </tbody>
+                </table>
+
+            </div>
+            <div class="x_content px-0 mb-0 py-0">
+                <div class="table-responsive py-0 mb-0">
+                    <table class="table table-striped jambo_table bulk_action">
+                        <tbody>
+                        <tr>
+                            <td class="text-left" style="width:25%"><b>Total Items</b></td>
+                            <td class="text-right" style="width:25%">{{ sale.total_items }}</td>
+                            <td class="text-left" style="width:25%"><b>Total</b></td>
+                            <td class="text-right" style="width:25%">{{ sale.total_price }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-left text-primary" style="width:25%"><b>Discount</b>
+                            </td>
+                            <td class="text-right" style="width:25%">{{ sale.discount }}</td>
+                            <td class="text-left text-primary" style="width:25%"><b>Order Tax</b>
+                            </td>
+                            <td class="text-right" style="width:25%">{{ sale.order_tax }}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="x_content px-0">
+                <div class="table-responsive">
+                    <table class="table table-striped jambo_table bulk_action">
+                        <tbody>
+                        <tr>
+                            <td class="text-left" style="width:50%">Total Payable <a
+                                    role="button" data-toggle="modal" data-target="#noteModal">
+                                <i class="fa fa-comment"></i>
+                            </a></td>
+                            <td class="text-right" style="width:50%">{{ sale.total_payable }}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="x_content px-0 text-center">
+                <a class="btn btn-app px-0 hold" style="width:40%" data-toggle="modal"
+                   data-target=".bs-example-modal-sm">
+                    <i class="fa fa-pause"></i> Hold
+                </a>
+                <a class="btn btn-app px-0" style="width:40%">
+                    <i class="fa fa-print"></i> Print Order
+                </a>
+                <a class="btn btn-app px-0" style="width:40%">
+                    <i class="fa fa-close"></i> Cancel
+                </a>
+                <a class="btn btn-app px-0" style="width:40%">
+                    <i class="fa fa-building-o"></i> Print Bill
+                </a>
+                <a class="btn btn-app px-0" style="width:85%" data-toggle="modal"
+                   data-target="#modalPayment">
+                    <i class="fa fa-money"></i> Payment
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+<div id="modalHold" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel2">Hold Order</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="{% url 'hold-sale' %}" method="POST" novalidate role="form" class="holdForm">
+                    {% csrf_token %}
+                    <input id="SaleID" type="hidden" data-url="{% url 'hold-sale' %}" data-slid="{{ sale.id }}">
+                    <div class="x_content bs-example-popovers">
+
+                        <div id="msg" class="alert alert-primary alert-dismissible " role="alert" style="display: none">
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+                                    aria-hidden="true">×</span>
+                            </button>
+                            <strong></strong>
+                        </div>
+                        <div id="msgfail" class="alert alert-danger alert-dismissible " role="alert"
+                             style="display: none">
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+                                    aria-hidden="true">×</span>
+                            </button>
+                            <strong></strong>
+                        </div>
+                    </div>
+                    {% for field in holdform %}
+                        {{ field.label_tag }}
+                        {{ field }}
+                    {% endfor %}
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" id="btnHoldForm" class="btn btn-primary">Save changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="modalCustomer" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel2">Add Customer</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="{% url 'create-customer' %}" method="POST" novalidate role="form" class="customerForm">
+                    {% csrf_token %}
+                    <input id="SaleId" type="hidden" data-url="{% url 'create-customer' %}" data-saleid="{{ sale.id }}">
+                    <div class="x_content bs-example-popovers">
+
+                        <div id="msgc" class="alert alert-primary alert-dismissible " role="alert"
+                             style="display: none">
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+                                    aria-hidden="true">×</span>
+                            </button>
+                            <strong></strong>
+                        </div>
+                        <div id="msgcfail" class="alert alert-danger alert-dismissible " role="alert"
+                             style="display: none">
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+                                    aria-hidden="true">×</span>
+                            </button>
+                            <strong></strong>
+                        </div>
+                    </div>
+                    {% for field in customerform %}
+                        <b class="text-center">{{ field.label_tag }}</b>
+                        {{ field }}
+                        <br>
+                    {% endfor %}
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" id="btnCustomerForm" class="btn btn-primary">Add Customer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="modalPayment" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" style="display: none;"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">Submit Payment</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-8 col-sm-8">
+                        <div class="x_content px-0 mb-0 py-0">
+                            <div class="table-responsive py-0 mb-0">
+                                <table class="table table-striped jambo_table bulk_action">
+                                    <tbody>
+                                    <tr>
+                                        <td class="text-left" style="width:25%"><b>Total Items</b></td>
+                                        <td id="totalItems" class="text-right"
+                                            style="width:25%">{{ sale.total_items }}</td>
+                                        <td class="text-left" style="width:25%"><b>Total Payable</b></td>
+                                        <td id="totalPayable" data-tp="{{ sale.total_payable }}" class="text-right"
+                                            style="width:25%">{{ sale.total_payable }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-left text-primary" style="width:25%"><b>Total Paying</b>
+                                        </td>
+                                        <td id="totalPaying" class="text-right"
+                                            style="width:25%">{{ sale.total_payable }}</td>
+                                        <td class="text-left text-primary" style="width:25%"><b>Balance</b>
+                                        </td>
+                                        <td id="balance" class="text-right" style="width:25%">0</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <form action="{% url 'create-payment' %}" method="POST" novalidate role="form"
+                              class="paymentForm">
+                            {% csrf_token %}
+                            <input id="Saleid" type="hidden" data-url="{% url 'create-payment' %}"
+                                   data-saleId="{{ sale.id }}">
+                            <div class="x_content bs-example-popovers">
+
+                                <div id="msgp" class="alert alert-primary alert-dismissible " role="alert"
+                                     style="display: none">
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+                                            aria-hidden="true">×</span>
+                                    </button>
+                                    <strong></strong>
+                                </div>
+                                <div id="msgpfail" class="alert alert-danger alert-dismissible " role="alert"
+                                     style="display: none">
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+                                            aria-hidden="true">×</span>
+                                    </button>
+                                    <strong></strong>
+                                </div>
+                            </div>
+                            {% for field in paymentform %}
+                                <b class="text-center">{{ field.label_tag }}</b>
+                                {{ field }}
+                                <br>
+                            {% endfor %}
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <button type="submit" id="btnCustomerForm" class="btn btn-primary">Submit Payment
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-md-4 col-sm-4">
+                        <div class="btn-group-vertical" role="group" aria-label="Vertical button group">
+                            <button type="button" class="btn btn-secondary">Currency Note Given</button>
+                            <button type="button" class="btn btn-warning"
+                                    value="{{ sale.total_payable }}">{{ sale.total_payable }}</button>
+                            <button type="button" class="btn btn-warning" value="10">10</button>
+                            <button type="button" class="btn btn-warning" value="20">20</button>
+                            <button type="button" class="btn btn-warning" value="50">50</button>
+                            <button type="button" class="btn btn-warning" value="100">100</button>
+                            <button type="button" class="btn btn-warning" value="500">500</button>
+                            <button type="button" class="btn btn-warning" value="1000">1000</button>
+                            <button type="button" class="btn btn-warning" value="5000">5000</button>
+                            <button id="clear" type="button" class="btn btn-danger">Clear</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        $('.holdForm').on('submit', function (e) {
+            e.preventDefault();
+            var sale_id = $('#SaleID').data('slid');
+            var note = $(this).find('#id_reference_note').val();
+            let csrf = $("input[name=csrfmiddlewaretoken]").val();
+            let url = $('#SaleID').data('url');
+            console.log(sale_id, note);
+            my_data = {sale_id: sale_id, note: note, csrfmiddlewaretoken: csrf}
+            $.ajax({
+                url: url, method: 'POST', data: my_data, success: function (data) {
+                    if (data.status === 'Saved') {
+                        $('#modalHold').modal('show');
+                        $("#msg strong").text("Order Held successfully");
+                        $("#msg").show();
+                        setTimeout(function () {
+                            $('#modalHold').modal('hide');
+                        }, 5000);
+                        $('.modal-backdrop').removeClass('modal-backdrop fade');
+                    } else if (data.status === 0) {
+                        $('#modalHold').modal('show');
+                        $("#msgfail strong").text("Unable to Hold order");
+                        $('#msgfail').show();
+                        setTimeout(function () {
+                            $('#modalHold').modal('hide');
+                        }, 5000);
+                        $('.modal-backdrop').removeClass('modal-backdrop fade');
+                    }
+                }
+            });
+        });
+        $('.customerForm').on('submit', function (e) {
+            e.preventDefault();
+            var name = $(this).find('#id_name').val();
+            var email = $(this).find('#id_email').val();
+            var phone = $(this).find('#id_phone').val();
+            var custom_1 = $(this).find('#id_customer_custom_field_1').val();
+            var custom_2 = $(this).find('#id_customer_custom_field_2').val();
+            let csrf = $("input[name=csrfmiddlewaretoken]").val();
+            var sale_id = $('#SaleId').data('saleid');
+            let url = $('#SaleId').data('url');
+            console.log(name, email, phone, custom_1, custom_2, sale_id);
+            my_data = {
+                sale_id: sale_id,
+                name: name,
+                email: email,
+                phone: phone,
+                custom_1: custom_1,
+                custom_2: custom_2,
+                csrfmiddlewaretoken: csrf
+            }
+            $.ajax({
+                url: url, method: 'POST', data: my_data, success: function (rsp) {
+                    let customer_id = rsp.cust_id;
+                    if (rsp.status === 'Saved') {
+                        $('#modalCustomer').modal('show');
+                        $("#msgc strong").text("Added the customer successfully");
+                        $("#msgc").show();
+                        setTimeout(function () {
+                            $('#modalCustomer').modal('hide');
+                        }, 5000);
+                        $('.modal-backdrop').removeClass('modal-backdrop fade');
+                        if (customer_id) {
+                            console.log(customer_id);
+                            $('#id_customer').val(customer_id);
+                        }
+                    } else if (rsp.status === 0) {
+                        $('#modalCustomer').modal('show');
+                        $("#msgcfail strong").text("Unable to add customer");
+                        $('#msgcfail').show();
+                        setTimeout(function () {
+                            $('#modalCustomer').modal('hide');
+                        }, 5000);
+                        $('.modal-backdrop').removeClass('modal-backdrop fade');
+                    }
+                }
+            });
+        });
+        $('.paymentForm').on('submit', function (e) {
+            e.preventDefault();
+            var sale_id = $('#saleId').data('sid');
+            let url = $('#Saleid').data('url');
+            var note = $(this).find('#id_note').val();
+            var amount = $(this).find('#id_amount').val();
+            var payment_by = $(this).find('#id_payment_by').val();
+            var payment_note = $(this).find('#id_payment_note').val();
+            let csrf = $("input[name=csrfmiddlewaretoken]").val();
+            console.log(note, amount, payment_by, payment_note, sale_id);
+            my_data = {
+                sale_id: sale_id,
+                note: note,
+                amount: amount,
+                payment_by: payment_by,
+                payment_note: payment_note,
+                csrfmiddlewaretoken: csrf
+            }
+            $.ajax({
+                url: url, method: 'POST', data: my_data, success: function (rsp) {
+                    if (rsp.status === 'Saved') {
+                        $('#modalPayment').modal('show');
+                        $("#msgp strong").text("Payment submitted successfully");
+                        $("#msgp").show();
+                        setTimeout(function () {
+                            $('#modalPayment').modal('hide');
+                        }, 5000);
+                        $('.modal-backdrop').removeClass('modal-backdrop fade');
+                    } else if (rsp.status === 0) {
+                        $('#modalPayment').modal('show');
+                        $("#msgpfail strong").text("Unable to submit payment");
+                        $('#msgpfail').show();
+                        setTimeout(function () {
+                            $('#modalPayment').modal('hide');
+                        }, 5000);
+                        $('.modal-backdrop').removeClass('modal-backdrop fade');
+                    }
+                }
+            });
+        });
+        $(".btn-group-vertical button").on("click", function () {
+            var buttonText = $(this).text();
+            var total_paying = $(this).val();
+            var total_payable = $('#totalPayable').data('tp');
+            var balance = total_paying - total_payable
+            console.log(total_paying, total_payable, balance);
+            $('#totalPaying').html(buttonText);
+            $('#id_amount').val(total_payable);
+            $('#balance').html(balance);
+        });
+        $("#clear").on("click", function () {
+            $('#totalPaying').html(0);
+            $('#id_amount').val(0);
+        });
+        $(document).ready(function () {
+            $('#delete_saleitem a').on('click', function (e) {
+                e.preventDefault();
+                console.log('Open Prevented');
+                var sale_id = $('#saleId').data('sid');
+                var saleitem_id = $(this).data('sp');
+                let url = $(this).data('url');
+                let csrf = $("input[name=csrfmiddlewaretoken]").val();
+                console.log(sale_id, saleitem_id);
+                var my_data = {sale_id: sale_id, saleitem_id: saleitem_id, csrfmiddlewaretoken: csrf}
+                $.ajax({
+                    url: url, method: 'POST', data: my_data, success: function (rsp) {
+                        console.log(rsp)
+                        $('.billing').html(rsp);
+                    }
+                })
+            })
+        })
+    });
+</script>

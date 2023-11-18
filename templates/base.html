@@ -1,20 +1,21 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <!-- Meta, title, CSS, favicons, etc. -->
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="icon" href="{% static 'images/favicon.ico' %}" type="image/ico" />
+    <link rel="icon" href="{% static 'images/favicon.ico' %}" type="image/ico"/>
 
     <title>{% block title %}
-    
+
     {% endblock %}</title>
 
     <!-- Bootstrap -->
     <link href="{% static 'vendors/bootstrap/dist/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <!-- Font Awesome -->
     <link href="{% static 'vendors/font-awesome/css/font-awesome.min.css' %}" rel="stylesheet">
     <!-- NProgress -->
@@ -31,255 +32,228 @@
 
     <!-- Custom Theme Style -->
     <link href="{% static 'build/css/custom.min.css' %}" rel="stylesheet">
-  </head>
-
-  <body class="nav-md">
-    <div class="container body">
-      <div class="main_container">
+    {% block links %}{% endblock %}
+</head>
+<body class="nav-md">
+<div class="container body">
+    <div class="main_container">
         <div class="col-md-3 left_col">
-          <div class="left_col scroll-view">
-            <div class="navbar nav_title" style="border: 0;">
-              <a href="#" class="site_title"><i class="fa fa-star-o"></i> <span>Simple<b>POS</b></span></a>
+            <div class="left_col scroll-view">
+                <div class="navbar nav_title" style="border: 0;">
+                    <a href="#" class="site_title"><i class="fa fa-star-o"></i> <span>Simple<b>POS</b></span></a>
+                </div>
+
+                <div class="clearfix"></div>
+
+                <!-- menu profile quick info -->
+                <div class="profile clearfix">
+                    <div class="profile_pic">
+                        <img src="{% static 'images/img.jpg' %}" alt="..." class="img-circle profile_img">
+                    </div>
+                    <div class="profile_info">
+                        <span>Welcome,</span>
+                        <h2>{{ user.username|capfirst }}</h2>
+                    </div>
+                </div>
+                <!-- /menu profile quick info -->
+
+                <br/>
+
+                <!-- sidebar menu -->
+                <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+                    <div class="menu_section">
+                        <h3>General</h3>
+                        <ul class="nav side-menu">
+                            <li><a href=""><i class="fa fa-home"></i> Dashboard </a>
+                            </li>
+                            <li><a href="{% url 'stores' %}"><i class="fa fa-tablet"></i> Stores </a>
+                            </li>
+                            <li><a href="{% url 'create-sale' %}"><i class="fa fa-th"></i> POS </a>
+                            </li>
+                            <li><a><i class="fa fa-barcode"></i> Products <span class="fa fa-chevron-down"></span></a>
+                                <ul class="nav child_menu">
+                                    <li><a href="{% url 'list-products' %}">List Products</a></li>
+                                    <li><a href="{% url 'add-product' %}">Add Products</a></li>
+                                    <li><a href="#">Import Products</a></li>
+                                    <hr>
+                                    <li><a href="#">Print Barcodes</a></li>
+                                    <li><a href="#">Print Labels</a></li>
+                                </ul>
+                            </li>
+                            <li><a><i class="fa fa-folder"></i> Categories <span class="fa fa-chevron-down"></span></a>
+                                <ul class="nav child_menu">
+                                    <li><a href="{% url 'list-categories' %}">List Categories</a></li>
+                                    <li><a href="{% url 'add-category' %}">Add Category</a></li>
+                                    <li><a href="#">Import Categories</a></li>
+                                </ul>
+                            </li>
+                            <li><a><i class="fa fa-shopping-cart"></i> Sales <span class="fa fa-chevron-down"></span></a>
+                                <ul class="nav child_menu">
+                                    <li><a href="{% url 'list-sales' %}">List Sales</a></li>
+                                    <li><a href="{% url 'list-opened-bills' %}">List Opened Bills</a></li>
+                                </ul>
+                            </li>
+                            <li><a><i class="fa fa-plus"></i> Purchases <span class="fa fa-chevron-down"></span></a>
+                                <ul class="nav child_menu">
+                                    <li><a href="{% url 'list-purchase-orders' %}">List Purchases</a></li>
+                                    <li><a href="{% url 'add-purchase-order' %}">Add Purchase</a></li>
+                                    <hr>
+                                    <li><a href="{% url 'list-expenses' %}">List Expenses</a></li>
+                                    <li><a href="{% url 'add-expense' %}">Add Expense</a></li>
+                                </ul>
+                            </li>
+                            <li><a><i class="fa fa-users"></i> People <span class="fa fa-chevron-down"></span></a>
+                                <ul class="nav child_menu">
+                                    <li><a href="{% url 'list-users' %}">List Users</a></li>
+                                    <li><a href="{% url 'add-user' %}">Add User</a></li>
+                                    <hr>
+                                    <li><a href="{% url 'list-customers' %}">List Customers</a></li>
+                                    <li><a href="{% url 'add-customer' %}">Add Customer</a></li>
+                                    <hr>
+                                    <li><a href="{% url 'list-suppliers' %}">List Suppliers</a></li>
+                                    <li><a href="{% url 'add-supplier' %}">Add Supplier</a></li>
+                                </ul>
+                            </li>
+                            <li><a><i class="fa fa-cogs"></i> Settings <span class="fa fa-chevron-down"></span></a>
+                                <ul class="nav child_menu">
+                                    <li><a href="#">Settings</a></li>
+                                    <hr>
+                                    <li><a href="{% url 'stores' %}">Stores</a></li>
+                                    <li><a href="{% url 'create-store' %}">Add Store</a></li>
+                                    <hr>
+                                    <li><a href="#">Printers</a></li>
+                                    <li><a href="#">Add Printer</a></li>
+                                    <hr>
+                                    <li><a href="#">Backups</a></li>
+                                </ul>
+                            </li>
+                            <li><a><i class="fa fa-bar-chart-o"></i>Reports <span class="fa fa-chevron-down"></span></a>
+                                <ul class="nav child_menu">
+                                    <li><a href="#">Daily Sales</a></li>
+                                    <li><a href="#">Monthly Sales</a></li>
+                                    <li><a href="#">Sales Report</a></li>
+                                    <hr>
+                                    <li><a href="#">Payment Report</a></li>
+                                    <hr>
+                                    <li><a href="#">Registers Report</a></li>
+                                    <hr>
+                                    <li><a href="#">Top Products</a></li>
+                                    <li><a href="#">Products Report</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+
+                </div>
+                <!-- /sidebar menu -->
+
+                <!-- /menu footer buttons -->
+                <div class="sidebar-footer hidden-small">
+                    <a data-toggle="tooltip" data-placement="top" title="Settings">
+                        <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
+                    </a>
+                    <a data-toggle="tooltip" data-placement="top" title="FullScreen">
+                        <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>
+                    </a>
+                    <a data-toggle="tooltip" data-placement="top" title="Lock">
+                        <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
+                    </a>
+                    <a data-toggle="tooltip" data-placement="top" title="Logout" href="#">
+                        <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
+                    </a>
+                </div>
+                <!-- /menu footer buttons -->
             </div>
-
-            <div class="clearfix"></div>
-
-            <!-- menu profile quick info -->
-            <div class="profile clearfix">
-              <div class="profile_pic">
-                <img src="{% static 'images/img.jpg' %}" alt="..." class="img-circle profile_img">
-              </div>
-              <div class="profile_info">
-                <span>Welcome,</span>
-                <h2>{{ user.username|capfirst}}</h2>
-              </div>
-            </div>
-            <!-- /menu profile quick info -->
-
-            <br />
-
-            <!-- sidebar menu -->
-            <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
-              <div class="menu_section">
-                <h3>General</h3>
-                <ul class="nav side-menu">
-                  <li><a href=""><i class="fa fa-home"></i> Dashboard </a>
-                  </li>
-                    <li><a href=""><i class="fa fa-tablet"></i> Stores </a>
-                  </li>
-                    <li><a href=""><i class="fa fa-th"></i> POS </a>
-                  </li>
-                  <li><a><i class="fa fa-barcode"></i> Products <span class="fa fa-chevron-down"></span></a>
-                    <ul class="nav child_menu">
-                      <li><a href="#">List Products</a></li>
-                      <li><a href="#">Add Products</a></li>
-                      <li><a href="#">Import Products</a></li>
-                        <hr>
-                      <li><a href="#">Print Barcodes</a></li>
-                      <li><a href="#">Print Labels</a></li>
-                    </ul>
-                  </li>
-                  <li><a><i class="fa fa-folder"></i> Categories <span class="fa fa-chevron-down"></span></a>
-                    <ul class="nav child_menu">
-                      <li><a href="#">List Categories</a></li>
-                      <li><a href="#">Add Category</a></li>
-                      <li><a href="#">Import Categories</a></li>
-                    </ul>
-                  </li>
-                  <li><a><i class="fa fa-users"></i> People <span class="fa fa-chevron-down"></span></a>
-                    <ul class="nav child_menu">
-                      <li><a href="{% url 'list-users' %}">List Users</a></li>
-                      <li><a href="{% url 'add-user' %}">Add User</a></li>
-                        <hr>
-                        <li><a href="#">List Customers</a></li>
-                      <li><a href="#">Add Customer</a></li>
-                        <hr>
-                        <li><a href="#">List Suppliers</a></li>
-                      <li><a href="#">Add Supplier</a></li>
-                    </ul>
-                  </li>
-                  <li><a><i class="fa fa-cogs"></i> Settings <span class="fa fa-chevron-down"></span></a>
-                    <ul class="nav child_menu">
-                      <li><a href="#">Settings</a></li>
-                        <hr>
-                      <li><a href="#">Stores</a></li>
-                      <li><a href="#">Add Store</a></li>
-                        <hr>
-                      <li><a href="#">Printers</a></li>
-                      <li><a href="#">Add Printer</a></li>
-                        <hr>
-                        <li><a href="#">Backups</a></li>
-                    </ul>
-                  </li>
-                  <li><a><i class="fa fa-bar-chart-o"></i>Reports <span class="fa fa-chevron-down"></span></a>
-                    <ul class="nav child_menu">
-                      <li><a href="#">Daily Sales</a></li>
-                      <li><a href="#">Monthly Sales</a></li>
-                      <li><a href="#">Sales Report</a></li>
-                        <hr>
-                        <li><a href="#">Payment Report</a></li>
-                        <hr>
-                        <li><a href="#">Registers Report</a></li>
-                        <hr>
-                        <li><a href="#">Top Products</a></li>
-                        <li><a href="#">Products Report</a></li>
-                    </ul>
-                  </li>
-                </ul>
-              </div>
-
-            </div>
-            <!-- /sidebar menu -->
-
-            <!-- /menu footer buttons -->
-            <div class="sidebar-footer hidden-small">
-              <a data-toggle="tooltip" data-placement="top" title="Settings">
-                <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
-              </a>
-              <a data-toggle="tooltip" data-placement="top" title="FullScreen">
-                <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>
-              </a>
-              <a data-toggle="tooltip" data-placement="top" title="Lock">
-                <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
-              </a>
-              <a data-toggle="tooltip" data-placement="top" title="Logout" href="#">
-                <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
-              </a>
-            </div>
-            <!-- /menu footer buttons -->
-          </div>
         </div>
 
         <!-- top navigation -->
         <div class="top_nav">
-          <div class="nav_menu">
-              <div class="nav toggle">
-                <a id="menu_toggle"><i class="fa fa-bars"></i></a>
-              </div>
-              <nav class="nav navbar-nav">
-              <ul class=" navbar-right">
-                <li class="nav-item dropdown open" style="padding-left: 15px;">
-                  <a href="javascript:" class="user-profile dropdown-toggle" aria-haspopup="true" id="navbarDropdown" data-toggle="dropdown" aria-expanded="false">
-                    <img src="{% static 'images/img.jpg' %}" alt="">{{ user.username|capfirst}}
-                  </a>
-                  <div class="dropdown-menu dropdown-usermenu pull-right" aria-labelledby="navbarDropdown">
-                    <a class="dropdown-item"  href="javascript:"> Profile</a>
-                    <a class="dropdown-item"  href="#"><i class="fa fa-sign-out pull-right"></i> Log Out</a>
-                  </div>
-                </li>
+            <div class="nav_menu">
+                <div class="nav toggle">
+                    <a id="menu_toggle"><i class="fa fa-bars"></i></a>
+                </div>
+                <nav class="nav navbar-nav">
+                    <ul class=" navbar-right">
+                        <li class="nav-item dropdown open" style="padding-left: 15px;">
+                            <a href="javascript:" class="user-profile dropdown-toggle" aria-haspopup="true"
+                               id="navbarDropdown" data-toggle="dropdown" aria-expanded="false">
+                                <img src="{% static 'images/img.jpg' %}" alt="">{{ user.username|capfirst }}
+                            </a>
+                            <div class="dropdown-menu dropdown-usermenu pull-right" aria-labelledby="navbarDropdown">
+                                <a class="dropdown-item" href="{% url 'update-user' user.id %}"> Profile</a>
+                                <a class="dropdown-item" href="#"><i class="fa fa-sign-out pull-right"></i> Log Out</a>
+                            </div>
+                        </li>
 
-                <li role="presentation" class="nav-item dropdown open">
-                  <a href="javascript:" class="dropdown-toggle info-number" id="navbarDropdown1" data-toggle="dropdown" aria-expanded="false">
-                    <i class="fa fa-envelope-o"></i>
-                    <span class="badge bg-green"></span>
-                  </a>
-                  <ul class="dropdown-menu list-unstyled msg_list" role="menu" aria-labelledby="navbarDropdown1">
-                    <li class="nav-item">
-                      <a class="dropdown-item">
-                        <span class="image"><img src="{% static 'images/img.jpg' %}" alt="Profile Image" /></span>
-                        <span>
-                          <span>John Smith</span>
-                          <span class="time">3 mins ago</span>
-                        </span>
-                        <span class="message">
-                          Film festivals used to be do-or-die moments for movie makers. They were where...
-                        </span>
-                      </a>
-                    </li>
-                    <li class="nav-item">
-                      <div class="text-center">
-                        <a class="dropdown-item">
-                          <strong>See All Alerts</strong>
-                          <i class="fa fa-angle-right"></i>
+                        <li role="presentation" class="nav-item dropdown open show">
+                    <a href="javascript:" class="dropdown-toggle info-number" id="navbarDropdown1" data-toggle="dropdown" aria-expanded="false">
+                      <i class="fa fa-envelope-o"></i>
+                      <span class="badge bg-green">{{ notifications.count }}</span>
+                    </a>
+                    <ul class="dropdown-menu list-unstyled msg_list" role="menu" aria-labelledby="navbarDropdown1" x-placement="bottom-start" style="position: absolute; will-change: transform; top: 0; left: 0; transform: translate3d(-141px, 16px, 0px);">
+                        {% for notification in notifications %}
+                      <li class="nav-item">
+                        <a class="dropdown-item" href="{% url 'update-sale' notification.id %}">
+                          <span class="image"><img src="#" alt="Profile Image"></span>
+                          <span>
+                            <span>{{ user.username|capfirst}}</span>
+                            <span class="time">{{ notification.created_at}}</span>
+                          </span>
+                          <span class="message">
+                            {{ notification.holds.reference_note }}
+                          </span>
                         </a>
-                      </div>
-                    </li>
-                  </ul>
-                </li>
-                  <li><a class="px-4" href="" data-toggle="tooltip" title="POS"><i class="fa fa-th"></i> </a>
+                      </li>
+                        {% endfor %}
+                      <li class="nav-item">
+                        <div class="text-center">
+                          <a class="dropdown-item">
+                            <strong>See All Alerts</strong>
+                            <i class="fa fa-angle-right"></i>
+                          </a>
+                        </div>
+                      </li>
+                    </ul>
                   </li>
-                  <li><a href="" data-toggle="tooltip" title="Customer Display"><i class="fa fa-desktop"></i></a>
-                  </li>
-                  <li><a class="px-4" href="" data-toggle="tooltip" title="Settings"><i class="fa fa-cogs"></i></a>
-                  </li>
-                  <li><a href="" data-toggle="tooltip" title="Dashboard"><i class="fa fa-dashboard"></i></a>
-                  </li>
-                  <li class="hidden-xs hidden-sm px-4"><a href="" class="clock"></a>
-                  </li>
-              </ul>
-            </nav>
-          </div>
+                        <li><a class="px-4" href="{% url 'create-sale' %}" data-toggle="tooltip" title="POS"><i class="fa fa-th"></i> </a>
+                        </li>
+                        <li><a href="" data-toggle="tooltip" title="Customer Display"><i class="fa fa-desktop"></i></a>
+                        </li>
+                        <li><a class="px-4" href="" data-toggle="tooltip" title="Settings"><i
+                                class="fa fa-cogs"></i></a>
+                        </li>
+                        <li><a href="" data-toggle="tooltip" title="Dashboard"><i class="fa fa-dashboard"></i></a>
+                        </li>
+                        <li class="hidden-xs hidden-sm px-4" id="datetime"><a href="" class="clock">{{ datetime }}</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
         </div>
         <!-- /top navigation -->
 
         <!-- page content -->
-          {% block content %}
-          {% endblock %}
+        {% block content %}
+        {% endblock %}
         <!-- /page content -->
 
         <!-- footer content -->
         <footer>
-          <div class="pull-right">
-            A Project by <a href="https://colorlib.com">Rana Awais Ahmad</a>
-          </div>
-          <div class="clearfix"></div>
+            <div class="pull-right">
+                A Project by <a href="https://colorlib.com">Rana Awais Ahmad</a>
+            </div>
+            <div class="clearfix"></div>
         </footer>
         <!-- /footer content -->
-      </div>
     </div>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-    <script src="{% static 'vendors/validator/multifield.js' %}"></script>
-    <script src="{% static 'vendors/validator/validator.js' %}"></script>
-
-    <!-- Javascript functions	-->
-	<script>
-		function hideshow(){
-			var password = document.getElementById("password1");
-			var slash = document.getElementById("slash");
-			var eye = document.getElementById("eye");
-
-			if(password.type === 'password'){
-				password.type = "text";
-				slash.style.display = "block";
-				eye.style.display = "none";
-			}
-			else{
-				password.type = "password";
-				slash.style.display = "none";
-				eye.style.display = "block";
-			}
-
-		}
-	</script>
-
-    <script>
-        // initialize a validator instance from the "FormValidator" constructor.
-        // A "<form>" element is optionally passed as an argument, but is not a must
-        var validator = new FormValidator({
-            "events": ['blur', 'input', 'change']
-        }, document.forms[0]);
-        // on form "submit" event
-        document.forms[0].onsubmit = function(e) {
-            var submit = true,
-                validatorResult = validator.checkAll(this);
-            console.log(validatorResult);
-            return !!validatorResult.valid;
-        };
-        // on form "reset" event
-        document.forms[0].onreset = function(e) {
-            validator.reset();
-        };
-        // stuff related ONLY for this demo page:
-        $('.toggleValidationTooltips').change(function() {
-            validator.settings.alerts = !this.checked;
-            if (this.checked)
-                $('form .alert').remove();
-        }).prop('checked', false);
-
-    </script>
-    <!-- jQuery -->
+</div>
+<!-- jQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-ajaxy/1.6.1/scripts/jquery.ajaxy.min.js" integrity="sha512-bztGAvCE/3+a1Oh0gUro7BHukf6v7zpzrAb3ReWAVrt+bVNNphcl2tDTKCBr5zk7iEDmQ2Bv401fX3jeVXGIcA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="{% static 'vendors/jquery/dist/jquery.min.js' %}"></script>
+    <script src="https://code.jquery.com/jquery-migrate-3.4.0.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <!-- Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
     <script src="{% static 'vendors/bootstrap/dist/js/bootstrap.bundle.min.js' %}"></script>
     <!-- FastClick -->
     <script src="{% static 'vendors/fastclick/lib/fastclick.js' %}"></script>
@@ -317,6 +291,71 @@
 
     <!-- Custom Theme Scripts -->
     <script src="{% static 'build/js/custom.min.js' %}"></script>
+    <script>
+    function updateCurrentTime() {
+        const currentTimeElement = document.getElementById('datetime');
+        const updateInterval = 1000;
 
-  </body>
+        function updateTime() {
+            const now = new Date();
+            currentTimeElement.textContent = now.toLocaleDateString() + " - " + now.toLocaleTimeString();
+        }
+
+        updateTime();
+        setInterval(updateTime, updateInterval);
+    }
+
+    updateCurrentTime();
+</script>
+<!-- Javascript functions	-->
+<script>
+    function hideshow() {
+        var password = document.getElementById("password1");
+        var slash = document.getElementById("slash");
+        var eye = document.getElementById("eye");
+
+        if (password.type === 'password') {
+            password.type = "text";
+            slash.style.display = "block";
+            eye.style.display = "none";
+        } else {
+            password.type = "password";
+            slash.style.display = "none";
+            eye.style.display = "block";
+        }
+
+    }
+</script>
+<script>
+    // initialize a validator instance from the "FormValidator" constructor.
+    // A "<form>" element is optionally passed as an argument, but is not a must
+    var validator = new FormValidator({
+        "events": ['blur', 'input', 'change']
+    }, document.forms[0]);
+    // on form "submit" event
+    document.forms[0].onsubmit = function (e) {
+        var submit = true,
+            validatorResult = validator.checkAll(this);
+        console.log(validatorResult);
+        return !!validatorResult.valid;
+    };
+    // on form "reset" event
+    document.forms[0].onreset = function (e) {
+        validator.reset();
+    };
+    // stuff related ONLY for this demo page:
+    $('.toggleValidationTooltips').change(function () {
+        validator.settings.alerts = !this.checked;
+        if (this.checked)
+            $('form .alert').remove();
+    }).prop('checked', false);
+
+</script>
+
+
+{% block scripts %}
+
+{% endblock %}
+
+</body>
 </html>

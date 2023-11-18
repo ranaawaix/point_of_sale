@@ -2,12 +2,12 @@ from django.core.exceptions import ValidationError
 
 from user_accounts.models import User
 from django import forms
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm, UserChangeForm
 
 
 class CreateUserForm(forms.ModelForm):
-    password1 = forms.CharField(label="Password")
-    password2 = forms.CharField(label="Password confirmation")
+    password1 = forms.CharField(label="Password", widget=forms.PasswordInput())
+    password2 = forms.CharField(label="Password confirmation", widget=forms.PasswordInput())
 
     class Meta:
         model = User
@@ -52,7 +52,24 @@ class LoginForm(AuthenticationForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.fields['username'].widget.attrs['class'] = 'form-control'
+        self.fields['username'].widget.attrs['class'] = 'form-control text-center'
         self.fields['username'].widget.attrs['placeholder'] = 'Enter your username...'
-        self.fields['password'].widget.attrs['class'] = 'form-control'
+        self.fields['password'].widget.attrs['class'] = 'form-control text-center'
         self.fields['password'].widget.attrs['placeholder'] = 'Enter your password...'
+
+
+class UserUpdateForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'phone', 'gender', 'group', 'username', 'email', 'status', 'store']
+        widgets = {
+            'group': forms.Select(attrs={'class': 'form-control', 'empty_label': '---Please Select---'}),
+            'first_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter First Name...'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter Last Name...'}),
+            'phone': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Enter Phone Number...'}),
+            'gender': forms.Select(attrs={'class': 'form-control', 'empty_label': '---Please Select---'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Enter Email...'}),
+            'username': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter Username...'}),
+            'status': forms.Select(attrs={'class': 'form-control', 'empty_label': '---Please Select---'}),
+            'store': forms.Select(attrs={'class': 'form-control', 'empty_label': '---Please Select---'}),
+        }

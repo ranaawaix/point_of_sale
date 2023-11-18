@@ -13,7 +13,7 @@ class Supplier(models.Model):
     supplier_custom_field_2 = models.CharField(max_length=250, null=True, blank=True)
 
     def __str__(self):
-        return f'{self.id}-{self.name}'
+        return self.name
 
 
 class ProductType(models.Model):
@@ -48,6 +48,9 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        verbose_name_plural = 'Categories'
+
 
 PERCENTAGE_VALIDATOR = [MinValueValidator(0), MaxValueValidator(100)]
 TAX_CHOICES = [
@@ -64,17 +67,18 @@ class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products')
     cost = models.PositiveIntegerField()
     price = models.PositiveIntegerField()
+    quantity = models.IntegerField(null=True, blank=True)
     product_tax = models.DecimalField(max_digits=3, decimal_places=0, default=0,
                                       validators=PERCENTAGE_VALIDATOR)
     tax_method = models.CharField(max_length=250, choices=TAX_CHOICES)
     alert_quantity = models.PositiveIntegerField(default=0)
-    image = models.ImageField(upload_to='media', null=True, blank=True)
+    image = models.ImageField(upload_to='media/', null=True, blank=True)
     details = models.TextField(null=True, blank=True)
     created_on = models.DateTimeField(auto_now_add=True)
     modified_on = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f'{self.name} + {self.type}'
+        return self.name
 
 
 RECEIVED_CHOICES = [
@@ -84,23 +88,26 @@ RECEIVED_CHOICES = [
 
 
 class PurchaseOrder(models.Model):
-    date = models.DateTimeField(validators=[MinValueValidator(datetime.date.today)])
-    reference = models.CharField(max_length=250)
+    date = models.DateTimeField()
+    reference = models.CharField(max_length=250, null=True, blank=True)
     total = models.IntegerField()
-    supplier = models.ForeignKey(Supplier, on_delete=models.DO_NOTHING, related_name='purchaseorders')
-    status = models.CharField(choices=RECEIVED_CHOICES, max_length=250)
+    supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE, related_name='purchaseorders', null=True, blank=True)
+    status = models.CharField(choices=RECEIVED_CHOICES, max_length=250, default='N')
     attachment = models.FileField(upload_to='media', null=True, blank=True)
     note = models.TextField(null=True, blank=True)
     created_on = models.DateTimeField(auto_now_add=True)
     modified_on = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f'{self.id}/{self.date}/{self.supplier}'
+        return f'{self.id}'
+
+    class Meta:
+        verbose_name_plural = 'Purchase Orders'
 
 
 class PurchaseOrderItem(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.DO_NOTHING, related_name='purchaseorderitems')
-    purchase_order = models.ForeignKey(PurchaseOrder, on_delete=models.DO_NOTHING, related_name='purchaseorderitems')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='purchaseorderitems')
+    purchase_order = models.ForeignKey(PurchaseOrder, on_delete=models.CASCADE, related_name='purchaseorderitems')
     price = models.IntegerField()
     quantity = models.IntegerField()
     total = models.IntegerField()
@@ -108,7 +115,7 @@ class PurchaseOrderItem(models.Model):
     modified_on = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f'{self.product}-{self.created_on}'
+        return f'{self.product.name}'
 
 
 class Expense(models.Model):
@@ -121,4 +128,4 @@ class Expense(models.Model):
     modified_on = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f'{self.id}-{self.amount}-{self.created_on}'
+        return f'{self.reference}-{self.amount}'

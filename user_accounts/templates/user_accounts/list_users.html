@@ -72,14 +72,12 @@
                                                         <div class="btn-group btn-group-justified" role="group">
                                                             <div class="btn-group btn-group-xs" role="group">
                                                                 <a class="tip btn btn-warning btn-xs" title="Profile"
-                                                                   href="https://spos.tecdiary.net/users/profile/2"><i
+                                                                   href="{% url 'update-user' user.id %}"><i
                                                                         class="fa fa-edit"></i></a>
                                                             </div>
                                                             <div class="btn-group btn-group-xs" role="group">
                                                                 <a class="tip btn btn-danger btn-xs" title="Delete User"
-                                                                   href="https://spos.tecdiary.net/auth/delete/2"
-                                                                   onclick="if (!window.__cfRLUnblockHandlers) return false; return confirm('You are going to remove this user permanently. Press OK to proceed and Cancel to Go Back')"><i
-                                                                        class="fa fa-trash-o"></i></a>
+                                                                   href="{%  url 'delete-user' user.id %}"><i class="fa fa-trash-o"></i></a>
                                                             </div>
                                                         </div>
                                                     </td>

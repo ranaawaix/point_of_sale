@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+    List Categories
+{% endblock %}
+{% block content %}
+    <!-- page content -->
+    <div class="right_col" role="main">
+        <div class="">
+            <div class="page-title">
+                <div class="title_left">
+                    <h3>All Categories <small>List of all the Categories</small></h3>
+                </div>
+
+                <div class="title_right">
+                    <div class="col-md-5 col-sm-5 col-xs-12 form-group pull-right top_search">
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="Search for...">
+                            <span class="input-group-btn">
+                      <button class="btn btn-secondary" type="button">Go!</button>
+                    </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="clearfix"></div>
+
+            <div class="row">
+                <div class="col-md-12 col-sm-12 ">
+                    <div class="x_panel">
+                        <div class="x_title">
+                            <h2>All Categories<small>List</small></h2>
+                            <ul class="nav navbar-right panel_toolbox">
+                                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                </li>
+                            </ul>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="card-box table-responsive">
+                                        <p class="text-muted font-13 m-b-30">
+                                            List of all the Categories created
+                                        </p>
+
+                                        <table id="datatable-responsive"
+                                               class="table table-striped table-bordered dt-responsive nowrap"
+                                               cellspacing="0" width="100%">
+                                            <thead>
+                                            <tr>
+                                                <th>Image</th>
+                                                <th>Code</th>
+                                                <th>Name</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            {% for category in categories %}
+                                                <tr>
+                                                    <td><img src="{{ category.image.urls }}" alt="image"></td>
+                                                    <td>{{ category.code }}</td>
+                                                    <td>{{ category.name }}</td>
+                                                    <td class="text-center" style="padding:6px;">
+                                                        <div class="btn-group btn-group-justified" role="group">
+                                                            <div class="btn-group btn-group-xs" role="group">
+                                                                <a class="tip btn btn-warning btn-xs"
+                                                                   title="Edit Category"
+                                                                   href="{% url 'update-category' category.id %}"><i
+                                                                        class="fa fa-edit"></i></a>
+                                                            </div>
+                                                            <div class="btn-group btn-group-xs" role="group">
+                                                                <a class="tip btn btn-danger btn-xs"
+                                                                   title="Delete Category"
+                                                                   href="{% url 'delete-category' category.id %}"><i
+                                                                        class="fa fa-trash-o"></i></a>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-5">
+                                    <div class="dataTables_info" id="datatable-responsive_info" role="status"
+                                         aria-live="polite">Showing page {{ page_obj.number }}
+                                        of {{ page_obj.paginator.num_pages }}
+                                    </div>
+                                </div>
+                                <div class="col-sm-7">
+                                    <div class="dataTables_paginate paging_simple_numbers"
+                                         id="datatable-responsive_paginate">
+                                        <ul class="pagination">
+                                            {% if page_obj.has_previous %}
+                                                <li class="paginate_button previous"
+                                                    id="datatable-responsive_previous"><a
+                                                        href="?page=1"
+                                                        aria-controls="datatable-responsive"
+                                                        data-dt-idx="0" tabindex="0">&laquo; First</a>
+                                                </li>
+                                                <li class="paginate_button previous"
+                                                    id="datatable-responsive_previous"><a
+                                                        href="?page={{ page_obj.previous_page_number }}"
+                                                        aria-controls="datatable-responsive"
+                                                        data-dt-idx="0" tabindex="0">Previous</a>
+                                                </li>
+                                            {% endif %}
+                                            <li class="paginate_button active"><a href="#"
+                                                                                  aria-controls="datatable-responsive"
+                                                                                  data-dt-idx="1"
+                                                                                  tabindex="0">Page {{ page_obj.number }}
+                                                of {{ page_obj.paginator.num_pages }}</a>
+                                            </li>
+                                            {% if page_obj.has_next %}
+                                                <li class="paginate_button next" id="datatable-responsive_next"><a
+                                                        href="?page={{ page_obj.next_page_number }}"
+                                                        aria-controls="datatable-responsive"
+                                                        data-dt-idx="7"
+                                                        tabindex="0">Next</a>
+                                                </li>
+                                                <li class="paginate_button next" id="datatable-responsive_next"><a
+                                                        href="?page={{ page_obj.paginator.num_pages }}"
+                                                        aria-controls="datatable-responsive"
+                                                        data-dt-idx="7"
+                                                        tabindex="0">last &raquo;</a>
+                                                </li>
+                                            {% endif %}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /page content -->
+{% endblock %}

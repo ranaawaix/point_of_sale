@@ -1,0 +1,277 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+    Add Purchase
+{% endblock %}
+{% block content %}
+    <!-- page content -->
+    <div class="right_col" role="main">
+        <div class="">
+            <div class="page-title">
+                <div class="title_left">
+                    <h3>Add Purchase</h3>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+            <div class="row">
+                <div class="col-md-12 col-sm-12 ">
+                    <div class="x_panel bg-light">
+                        <div class="x_title">
+                            <h2>Add Purchase Form <small>Please enter the information below</small></h2>
+                            <ul class="nav navbar-right panel_toolbox">
+                                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                </li>
+                            </ul>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content">
+                            <br/>
+                            <form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left"
+                                  method="POST" action="" novalidate>
+                                {% csrf_token %}
+                                {% if form.non_field_errors %}
+                                    <div class="btn btn-danger">{{ form.non_field_errors }}</div>
+                                {% endif %}
+                                <div class="row">
+                                    <div class="col-md-6 col-sm-6">
+                                        <div class="item form-group">
+                                            <label class="col-form-label col-md-3 col-sm-3 label-align">
+                                                <b>{{ form.date.label_tag }}</b> {% if form.date.is_required %}
+                                                <span class="required">*</span>{% endif %}
+                                            </label>
+                                            <div class="col-md-9 col-sm-9 text-center">
+                                                {{ form.date }}
+                                                {% if form.errors %}
+                                                    <div class="btn btn-outline-danger">{{ form.date.errors|striptags }}</div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-6">
+                                        <div class="item form-group">
+                                            <label class="col-form-label col-md-3 col-sm-3 label-align">
+                                                <b>{{ form.reference.label_tag }}</b>
+                                                {% if form.reference.is_required %}
+                                                    <span class="required">*</span>{% endif %}
+                                            </label>
+                                            <div class="col-md-9 col-sm-9 text-center">
+                                                {{ form.reference }}
+                                                {% if form.errors %}
+                                                    <div class="btn btn-outline-danger">{{ form.reference.errors|striptags }}</div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12 col-sm-12">
+                                        <div class="item form-group">
+                                            <div class="col-md-12 col-sm-12 text-center">
+                                                {{ purchase_order_item_formset.management_form }}
+                                                {{ purchase_order_item_formset.form.product }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row po_items">
+                                    {% include 'inventory/includes/purchase_item_include.html' %}
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 col-sm-6">
+                                        <div class="item form-group">
+                                            <label class="col-form-label col-md-3 col-sm-3 label-align">
+                                                <b>{{ form.supplier.label_tag }}</b> {% if form.supplier.is_required %}
+                                                <span class="required">*</span>{% endif %}
+                                            </label>
+                                            <div class="col-md-9 col-sm-9 text-center">
+                                                {{ form.supplier }}
+                                                {% if form.errors %}
+                                                    <div class="btn btn-outline-danger">{{ form.supplier.errors|striptags }}</div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-6">
+                                        <div class="item form-group">
+                                            <label class="col-form-label col-md-3 col-sm-3 label-align">
+                                                <b>{{ form.status.label_tag }}</b> {% if form.status.is_required %}
+                                                <span class="required">*</span>{% endif %}
+                                            </label>
+                                            <div class="col-md-9 col-sm-9 text-center">
+                                                {{ form.status }}
+                                                {% if form.errors %}
+                                                    <div class="btn btn-outline-danger">{{ form.status.errors|striptags }}</div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="item form-group">
+                                        <label class="col-form-label col-md-1 col-sm-1 label-align">
+                                            <b>{{ form.attachment.label_tag }}</b> {% if form.attachment.is_required %}
+                                            <span class="required">*</span>{% endif %}
+                                        </label>
+                                        <div class="col-md-11 col-sm-11 text-center">
+                                            {{ form.attachment }}
+                                            {% if form.errors %}
+                                                <div class="btn btn-outline-danger">{{ form.attachment.errors|striptags }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="item form-group">
+                                        <label class="col-form-label col-md-1 col-sm-1 label-align">
+                                            <b>{{ form.note.label_tag }}</b> {% if form.note.is_required %}
+                                            <span class="required">*</span>{% endif %}
+                                        </label>
+                                        <div class="col-md-11 col-sm-11 text-center">
+                                            {{ form.note }}
+                                            {% if form.errors %}
+                                                <div class="btn btn-outline-danger">{{ form.note.errors|striptags }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="ln_solid"></div>
+                                <div class="item form-group">
+                                    <div class="col-md-12 col-sm-12 offset-md-3">
+                                        <button id="btn_submit" type="button" class="btn btn-success"
+                                                data-url="{% url 'add-purchase-order' %}"
+                                                data-rurl="{% url 'list-purchase-orders' %}">Add Purchase
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /page content -->
+{% endblock %}
+{% block scripts %}
+    <script>
+        $(document).ready(function () {
+            $('#id_product').on('change', function (e) {
+                e.preventDefault()
+                let prod_id = $(this).val()
+                let csrf = $("input[name=csrfmiddlewaretoken]").val();
+                let po_id = $('#po_id').data('po_id')
+                console.log(prod_id, po_id);
+                let url = "{% url 'add-purchase-order-item' 0 %}".replace('0', prod_id);
+                let my_data = {prod_id: prod_id, csrfmiddlewaretoken: csrf, po_id: po_id}
+                $.ajax({
+                    url: url,
+                    data: my_data,
+                    method: 'POST',
+                    success: function (rsp) {
+                        console.log(rsp);
+                        $('.po_items').html(rsp)
+                        $('.po_items .table-striped tr').each(function () {
+                            $(this).find('#poi_quantity').each(function () {
+                                $(this).on('blur', function () {
+                                    let quantity = $(this).val();
+                                    let price = $(this).closest('tr').find('#poi_price').val();
+                                    let result = quantity * price;
+
+                                    $(this).closest('tr').find('#poi_total').text(result);
+
+                                    let subtotal = result;
+                                    let pur_id = $('#po_id').data('po_id');
+                                    let eurl = $(this).data('url');
+                                    let my_data = {
+                                        'po_id': pur_id,
+                                        'prod_id': prod_id,
+                                        'quantity': quantity,
+                                        'price': price,
+                                        'subtotal': subtotal,
+                                        csrfmiddlewaretoken: csrf
+                                    };
+
+                                    console.log(my_data);
+                                    $.ajax({
+                                        url: eurl,
+                                        method: 'POST',
+                                        data: my_data,
+                                        success: function (rsp) {
+                                            console.log(rsp);
+                                        }
+                                    });
+                                });
+                            })
+                        })
+                        $('.po_items').on('click', '#delete_saleitem a', function (e) {
+                            e.preventDefault();
+
+                            let url = $(this).data('url');
+                            let item_id = $(this).data('it_id');
+                            let po_id = $('#po_id').data('po_id');
+                            let csrf = $("input[name=csrfmiddlewaretoken]").val();
+
+                            let my_data = {
+                                'po_id': po_id,
+                                'item_id': item_id,
+                                'csrfmiddlewaretoken': csrf
+                            };
+                            console.log(my_data)
+                            $.ajax({
+                                url: url,
+                                method: 'POST',
+                                data: my_data,
+                                success: function (rsp) {
+                                    console.log(rsp);
+                                    $('.po_items').html(rsp);
+                                }
+                            });
+                        });
+                    }
+                })
+            })
+        })
+    </script>
+    <script>
+        $(document).ready(function () {
+            $('#btn_submit').on('click', function (e) {
+                e.preventDefault()
+                let po_id = $('#po_id').data('po_id')
+                let date = $('#id_date').val()
+                let reference = $('#id_reference').val()
+                let supplier = $('#id_supplier').val()
+                let status = $('#id_status').val()
+                let attachment = $('#id_attachment').val()
+                let note = $('#id_note').val()
+                console.log(po_id, date, reference, supplier, status, attachment, note)
+                let url = $(this).data('url')
+                let rurl = $(this).data('rurl')
+                let csrf = $("input[name=csrfmiddlewaretoken]").val();
+                let my_data = {
+                    'po_id': po_id,
+                    'date': date,
+                    'reference': reference,
+                    'supplier': supplier,
+                    'status': status,
+                    'attachment': attachment,
+                    'note': note,
+                    csrfmiddlewaretoken: csrf
+                }
+                $.ajax({
+                    url: url,
+                    method: 'POST',
+                    data: my_data,
+                    success: function (rsp) {
+                        console.log(rsp);
+                        rsp.success(window.location.href = rurl)
+                    }
+                })
+            })
+        })
+    </script>
+    {#    <script>#}
+    {#    $(document).ready(function () {#}
+    {#        #}
+    {#    })#}
+    {#    </script>#}
+{% endblock %}

@@ -9,12 +9,12 @@ from inventory.models import Product
 class Customer(models.Model):
     name = models.CharField(max_length=250)
     email = models.CharField(max_length=250, null=True, blank=True)
-    phone = models.PositiveIntegerField(validators=[MaxValueValidator(99999999999)], null=True, blank=True)
+    phone = models.BigIntegerField(null=True, blank=True)
     customer_custom_field_1 = models.CharField(max_length=250, null=True, blank=True)
     customer_custom_field_2 = models.CharField(max_length=250, null=True, blank=True)
 
     def __str__(self):
-        return f'{self.id}-{self.name}'
+        return self.name
 
 
 class Store(models.Model):
@@ -22,7 +22,7 @@ class Store(models.Model):
     code = models.CharField(max_length=250)
     logo = models.ImageField(null=True, blank=True)
     email = models.EmailField()
-    phone = models.IntegerField(validators=[MaxValueValidator(99999999999)], null=True, blank=True)
+    phone = models.BigIntegerField(null=True, blank=True)
     address = models.TextField()
     country = models.ForeignKey('cities_light.Country', on_delete=models.SET_NULL, null=True, blank=True)
     city = models.ForeignKey('cities_light.City', on_delete=models.SET_NULL, null=True, blank=True)
@@ -33,14 +33,17 @@ class Store(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f'{self.name}-{self.code}'
+        return self.name
 
 
 class StoreProduct(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='storeproducts')
     store = models.ForeignKey(Store, on_delete=models.CASCADE, related_name='storeproducts')
-    price = models.IntegerField(null=True, blank=True)
-    quantity = models.IntegerField()
+    store_price = models.IntegerField(null=True, blank=True)
+    quantity = models.IntegerField(default=0)
+
+    class Meta:
+        unique_together = ['product', 'store']
 
     def __str__(self):
         return f'{self.product}-{self.store}'
@@ -57,23 +60,22 @@ SALE_STATUS_CHOICES = [
 
 class Sale(models.Model):
     total_items = models.IntegerField()
-    total_price = models.IntegerField()
-    discount = models.DecimalField(max_digits=3, decimal_places=0, default=0,
-                                   validators=PERCENTAGE_VALIDATOR)
-    order_tax = models.FloatField(null=True, blank=True)
-    total_payable = models.FloatField()
-    customer = models.ForeignKey(Customer, on_delete=models.DO_NOTHING, related_name='sales')
-    status = models.CharField(choices=SALE_STATUS_CHOICES, max_length=250)
+    total_price = models.IntegerField(null=True, blank=True, default=0)
+    discount = models.IntegerField(default=0)
+    order_tax = models.IntegerField(null=True, blank=True, default=0)
+    total_payable = models.IntegerField(null=True, blank=True, default=0)
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='sales', default=27)
+    status = models.CharField(choices=SALE_STATUS_CHOICES, max_length=250, default='H')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f'{self.id}-{self.customer}'
+        return self.customer.name
 
 
 class SaleItem(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.DO_NOTHING, related_name='saleitems')
-    sale = models.ForeignKey(Sale, on_delete=models.DO_NOTHING, related_name='saleitems')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='saleitems')
+    sale = models.ForeignKey(Sale, on_delete=models.CASCADE, related_name='saleitems')
     price = models.IntegerField()
     quantity = models.IntegerField()
     total = models.IntegerField()
@@ -81,7 +83,7 @@ class SaleItem(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f'{self.id}-{self.product}'
+        return self.product.name
 
 
 PAYMENT_CHOICES = [
@@ -93,16 +95,16 @@ PAYMENT_CHOICES = [
 
 
 class Payment(models.Model):
-    sale = models.ForeignKey(Sale, on_delete=models.DO_NOTHING, related_name='payments')
+    sale = models.ForeignKey(Sale, on_delete=models.CASCADE, related_name='payments')
     note = models.TextField(null=True, blank=True)
     amount = models.IntegerField()
-    payment_by = models.CharField(choices=PAYMENT_CHOICES, max_length=250)
+    payment_by = models.CharField(choices=PAYMENT_CHOICES, max_length=250, default='Ca')
     payment_note = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f'{self.id}-{self.amount}-{self.created_at}'
+        return str(self.amount)
 
 
 class Hold(models.Model):
@@ -110,4 +112,4 @@ class Hold(models.Model):
     sale = models.ForeignKey(Sale, on_delete=models.CASCADE, related_name='holds')
 
     def __str__(self):
-        return f'{self.id}-{self.sale.customer}'
+        return self.reference_note

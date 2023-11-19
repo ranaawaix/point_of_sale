@@ -119,7 +119,7 @@ class PurchaseOrderItem(models.Model):
 
 
 class Expense(models.Model):
-    date = models.DateTimeField(validators=[MinValueValidator(datetime.date.today)])
+    date = models.DateTimeField()
     reference = models.CharField(max_length=250)
     amount = models.IntegerField()
     attachment = models.FileField(null=True, blank=True)

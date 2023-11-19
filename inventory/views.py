@@ -143,6 +143,16 @@ class DeletePurchaseItem(TemplateView):
         return self.render_to_response(context)
 
 
+# class UpdatePurchaseOrderView(UpdateView):
+#     model = PurchaseOrder
+#     form_class = AddPurchaseOrderForm
+#     template_name = 'inventory/add_purchase.html'
+
+
+# class DeletePurchaseOrderView(DeleteView):
+#     model = PurchaseOrder
+
+
 class PurchaseOrderListView(ListView):
     model = PurchaseOrder
     template_name = 'inventory/list_purchase_orders.html'
@@ -154,6 +164,7 @@ class AddExpenseView(CreateView):
     model = Expense
     form_class = AddExpenseForm
     template_name = 'inventory/add_expense.html'
+    success_url = reverse_lazy('list-expenses')
 
 
 class ListExpensesView(ListView):
@@ -172,6 +183,7 @@ class EditExpense(UpdateView):
 class DeleteExpense(DeleteView):
     model = Expense
     template_name = 'inventory/confirm_delete_expense.html'
+    success_url = reverse_lazy('list-expenses')
 
 
 class AddSuplierView(CreateView):

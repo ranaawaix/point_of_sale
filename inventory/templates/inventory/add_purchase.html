@@ -137,9 +137,13 @@
                                 <div class="ln_solid"></div>
                                 <div class="item form-group">
                                     <div class="col-md-12 col-sm-12 offset-md-3">
-                                        <button id="btn_submit" type="button" class="btn btn-success"
+                                        <button id="btn_submit" type="submit" class="btn btn-success"
                                                 data-url="{% url 'add-purchase-order' %}"
                                                 data-rurl="{% url 'list-purchase-orders' %}">Add Purchase
+                                        </button>
+                                        <button type="button" class="btn btn-info"><a class="text-white"
+                                                                                      href="{% url 'list-purchase-orders' %}">Cancel
+                                            Purchase</a>
                                         </button>
                                     </div>
                                 </div>
@@ -170,6 +174,12 @@
                     success: function (rsp) {
                         console.log(rsp);
                         $('.po_items').html(rsp)
+                        Swal.fire({
+                            icon: "success",
+                            title: "Item added to purchase order!",
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
                         $('.po_items .table-striped tr').each(function () {
                             $(this).find('#poi_quantity').each(function () {
                                 $(this).on('blur', function () {
@@ -198,6 +208,7 @@
                                         data: my_data,
                                         success: function (rsp) {
                                             console.log(rsp);
+                                            $('.po_items').html(rsp)
                                         }
                                     });
                                 });
@@ -217,13 +228,30 @@
                                 'csrfmiddlewaretoken': csrf
                             };
                             console.log(my_data)
-                            $.ajax({
-                                url: url,
-                                method: 'POST',
-                                data: my_data,
-                                success: function (rsp) {
-                                    console.log(rsp);
-                                    $('.po_items').html(rsp);
+                            Swal.fire({
+                                title: "Are you sure?",
+                                text: "You won't be able to revert this!",
+                                icon: "warning",
+                                showCancelButton: true,
+                                confirmButtonColor: "#3085d6",
+                                cancelButtonColor: "#d33",
+                                confirmButtonText: "Yes, delete it!"
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    $.ajax({
+                                        url: url,
+                                        method: 'POST',
+                                        data: my_data,
+                                        success: function (rsp) {
+                                            console.log(rsp);
+                                            $('.po_items').html(rsp);
+                                        }
+                                    });
+                                    Swal.fire({
+                                        title: "Deleted!",
+                                        text: "Your file has been deleted.",
+                                        icon: "success"
+                                    });
                                 }
                             });
                         });
@@ -263,7 +291,16 @@
                     data: my_data,
                     success: function (rsp) {
                         console.log(rsp);
+                        Swal.fire({
+                            icon: "success",
+                            title: "Purchase added",
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
                         rsp.success(window.location.href = rurl)
+                    },
+                    fail: function (rsp) {
+                        rsp.fail(window.location.href = url)
                     }
                 })
             })

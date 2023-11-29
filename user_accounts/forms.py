@@ -1,8 +1,7 @@
-from django.core.exceptions import ValidationError
-
-from user_accounts.models import User
 from django import forms
-from django.contrib.auth.forms import AuthenticationForm, UserChangeForm
+from django.contrib.auth.forms import AuthenticationForm
+from django.core.exceptions import ValidationError
+from user_accounts.models import User
 
 
 class CreateUserForm(forms.ModelForm):
@@ -12,7 +11,7 @@ class CreateUserForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ['group', 'first_name', 'last_name', 'phone', 'gender', 'email', 'username', 'password1', 'password2',
-                  'status', 'store']
+                  'status']
         widgets = {'group': forms.Select(attrs={'class': 'form-control', 'empty_label': '---Please Select---'}),
                    'first_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter First Name...'}),
                    'last_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter Last Name...'}),
@@ -20,8 +19,7 @@ class CreateUserForm(forms.ModelForm):
                    'gender': forms.Select(attrs={'class': 'form-control', 'empty_label': '---Please Select---'}),
                    'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Enter Email...'}),
                    'username': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter Username...'}),
-                   'status': forms.Select(attrs={'class': 'form-control', 'empty_label': '---Please Select---'}),
-                   'store': forms.Select(attrs={'class': 'form-control', 'empty_label': '---Please Select---'}), }
+                   'status': forms.Select(attrs={'class': 'form-control', 'empty_label': '---Please Select---'}), }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -61,7 +59,7 @@ class LoginForm(AuthenticationForm):
 class UserUpdateForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'phone', 'gender', 'group', 'username', 'email', 'status', 'store']
+        fields = ['first_name', 'last_name', 'phone', 'gender', 'group', 'username', 'email', 'status']
         widgets = {
             'group': forms.Select(attrs={'class': 'form-control', 'empty_label': '---Please Select---'}),
             'first_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter First Name...'}),

@@ -1,7 +1,7 @@
 from django import forms
 from django.forms import inlineformset_factory
 
-from POS.models import Sale, SaleItem, Hold, Customer, Payment, Store, StoreProduct
+from POS.models import Sale, SaleItem, Hold, Customer, Payment, Store, StoreProduct, Register
 from inventory.models import Product
 
 
@@ -35,7 +35,7 @@ class AddCustomerForm(forms.ModelForm):
         fields = ['name', 'email', 'phone', 'customer_custom_field_1', 'customer_custom_field_2']
         widgets = {'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Customer Name'}),
                    'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Customer Email'}),
-                   'phone': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Customer Phone'}),
+                   'phone': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Customer Phone'}),
                    'customer_custom_field_1': forms.Textarea(
                        attrs={'class': 'form-control', 'placeholder': 'Customer Extra Detail 1'}),
                    'customer_custom_field_2': forms.Textarea(
@@ -64,11 +64,9 @@ class AddStoreForm(forms.ModelForm):
                    'phone': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Store Phone'}),
                    'address': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Store Address'}),
                    'city': forms.Select(attrs={'class': 'form-control'}),
-                   'country': forms.Select(attrs={'class': 'form-control'}),
-                   'postal_code': forms.NumberInput(
-                       attrs={'class': 'form-control', 'placeholder': 'Store Postal Code'}),
-                   'receipt_header': forms.Textarea(
-                       attrs={'class': 'form-control', 'placeholder': 'Receipt Header Text'}),
+                   'country': forms.Select(attrs={'class': 'form-control'}), 'postal_code': forms.NumberInput(
+                attrs={'class': 'form-control', 'placeholder': 'Store Postal Code'}), 'receipt_header': forms.Textarea(
+                attrs={'class': 'form-control', 'placeholder': 'Receipt Header Text'}),
                    'receipt_footer': forms.Textarea(
                        attrs={'class': 'form-control', 'placeholder': 'Receipt Footer Text'}), }
 
@@ -79,8 +77,7 @@ class AddProductForm(forms.ModelForm):
         fields = ['type', 'name', 'code', 'barcode_symbology', 'category', 'cost', 'price', 'product_tax', 'tax_method',
                   'alert_quantity', 'image', 'details']
         exclude = ['quantity']
-        widgets = {
-            'type': forms.Select(attrs={'class': 'form-control'}),
+        widgets = {'type': forms.Select(attrs={'class': 'form-control'}),
             'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Product Name'}),
             'code': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Product Code'}),
             'barcode_symbology': forms.Select(attrs={'class': 'form-control'}),
@@ -91,10 +88,8 @@ class AddProductForm(forms.ModelForm):
             'tax_method': forms.Select(attrs={'class': 'form-control'}),
             'alert_quantity': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Alert Quantity of the '
                                                                                                'Product'}),
-            'image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
-            'details': forms.Textarea(
-                attrs={'class': 'form-control', 'placeholder': 'Any other details of the Product'}),
-        }
+            'image': forms.ClearableFileInput(attrs={'class': 'form-control'}), 'details': forms.Textarea(
+                attrs={'class': 'form-control', 'placeholder': 'Any other details of the Product'}), }
 
 
 class StoreProductForm(forms.ModelForm):
@@ -108,10 +103,16 @@ class StoreProductForm(forms.ModelForm):
         model = StoreProduct
         fields = ['store', 'store_price', 'quantity']
         exclude = ['product', 'id']
-        widgets = {
-            'store_price': forms.NumberInput(
-                attrs={'class': 'form-control', 'placeholder': 'Price of the Product in this store'}),
+        widgets = {'store_price': forms.NumberInput(
+            attrs={'class': 'form-control', 'placeholder': 'Price of the Product in this store'}),
             'quantity': forms.NumberInput(
                 attrs={'class': 'form-control', 'placeholder': 'Quantity of the Product in this store'}),
-            'store': forms.HiddenInput(),
-        }
+            'store': forms.HiddenInput(), }
+
+
+class CashInHandForm(forms.ModelForm):
+    class Meta:
+        model = Register
+        fields = ['opening_cash_in_hand']
+        widgets = {'opening_cash_in_hand': forms.NumberInput(
+            attrs={'class': 'form-control', 'placeholder': 'Opening cash in hand'}), }

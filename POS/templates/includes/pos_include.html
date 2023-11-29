@@ -13,7 +13,7 @@
                             data-target="#modalCustomer"><i class="fa fa-plus-circle"></i></button>
                 </div>
             </div>
-            <div class="x_content min-vh-100">
+            <div class="x_content" style="min-height: 25vh">
                 <table class="table table-bordered">
                     <thead>
                     <tr>
@@ -30,9 +30,13 @@
                         <tr>
                             <td class="saleitem_name text-center">{{ saleitem.product.name }}</td>
                             <td class="saleitem_price text-center">{{ saleitem.price }}</td>
-                            <td class="saleitem_quantity text-center">{{ saleitem.quantity }}</td>
+                            <td class="saleitem_quantity text-center" style="max-width: 40px">
+                                <input class="text-center" id="sale_item_quantity"
+                                       type="number"
+                                       value="{{ saleitem.quantity }}"
+                                       style="max-width: 40px" data-eurl="{% url 'update-sale-item' %}"></td>
                             <td class="saleitem_subtotal text-center">{{ saleitem.total }}</td>
-                            <td id="delete_saleitem" class="saleitem_subtotal text-center"><a
+                            <td id="delete_saleitem" class="text-center"><a
                                     data-url="{% url 'delete-saleitem' %}" href="#" data-sp="{{ saleitem.product.id }}"><i
                                     class="fa fa-trash-o"></i></a></td>
                         </tr>
@@ -453,7 +457,6 @@
         $(document).ready(function () {
             $('#delete_saleitem a').on('click', function (e) {
                 e.preventDefault();
-                console.log('Open Prevented');
                 let sale_id = $('#saleId').data('sid');
                 let saleitem_id = $(this).data('sp');
                 let url = $(this).data('url');
@@ -464,6 +467,12 @@
                     url: url, method: 'POST', data: my_data, success: function (rsp) {
                         console.log(rsp)
                         $('.billing').html(rsp);
+                        Swal.fire({
+                            icon: "success",
+                            title: "Item Deleted Successfully",
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
                     }
                 })
             })

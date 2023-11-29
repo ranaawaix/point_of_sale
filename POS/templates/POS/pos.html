@@ -25,7 +25,7 @@
                                     <div class="thumbnail">
                                         <div class="view-first py-0 mb-0">
                                             {% if product.image.url %}
-                                                <a class="product" href="#" data-pid="{{ product.id }}" data-sid="{{ sale.saleitems.id }}" data-url="{% url 'create-sale-product' product.id %}"><img style="width: 100%; display: block; height: 100px" src="{{product.image.url}}"
+                                                <a class="product" href="#" data-pid="{{ product.id }}" data-sid="{{ sale.saleitems.id }}" data-url="{% url 'create-sale-product' product.id %}" data-user="{{ user.id }}" data-register_id="{{ register.id }}"><img style="width: 100%; display: block; height: 100px" src="{{product.image.url}}"
                                                  alt="image"/></a>
                                             {% else %}
                                                 <img style="width: 100%; display: block;" src="#"

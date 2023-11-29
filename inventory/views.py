@@ -1,13 +1,17 @@
 import datetime
 
+from django.views.generic.edit import DeletionMixin
+
+from user_accounts.models import User
 from django.db.models import Sum
 from django.forms import modelformset_factory
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, TemplateView
 from POS.models import Product
-from inventory.forms import AddCategoriesForm, AddPurchaseOrderForm, PurchaseOrderItemForm, AddExpenseForm, AddSupplierForm
+from inventory.forms import AddCategoriesForm, AddPurchaseOrderForm, PurchaseOrderItemForm, AddExpenseForm, \
+    AddSupplierForm
 from inventory.models import Category, PurchaseOrder, PurchaseOrderItem, Supplier, Expense
 
 
@@ -25,6 +29,17 @@ class AddCategory(CreateView):
     model = Category
     form_class = AddCategoriesForm
     template_name = 'inventory/add_category.html'
+    success_url = reverse_lazy('list-categories')
+
+    def post(self, request, *args, **kwargs):
+        user_id = request.user.id
+        user = User.objects.get(id=user_id)
+        image = request.POST.get('image')
+        code = request.POST.get('code')
+        name = request.POST.get('name')
+        category = Category(user=user, image=image, code=code, name=name)
+        category.save()
+        return redirect(self.success_url)
 
 
 class UpdateCategoryView(UpdateView):
@@ -62,6 +77,8 @@ class AddPurchaseView(CreateView):
     def post(self, request, *args, **kwargs):
         po_id = request.POST.get('po_id')
         purchase_order = PurchaseOrder.objects.get(id=po_id)
+        user = request.user
+        purchase_order.user = user
         purchase_order.date = request.POST.get('date')
         purchase_order.reference = request.POST.get('reference')
         supplier_id = request.POST.get('supplier')
@@ -78,31 +95,20 @@ class AddPurchaseOrderItemView(TemplateView):
     template_name = 'inventory/includes/purchase_item_include.html'
 
     def post(self, request, *args, **kwargs):
-        purchase_order_id = self.request.POST.get('po_id')
-        if not purchase_order_id:
-            purchase_order = PurchaseOrder(total=0, date=datetime.datetime.now())
-            purchase_order.save()
-        else:
-            purchase_order = get_object_or_404(PurchaseOrder.objects.filter(id=purchase_order_id))
+        po_id = self.request.POST.get('po_id')
+        user = request.user
         prod_id = self.request.POST.get('prod_id')
         product = Product.objects.get(id=prod_id)
-        po_item = PurchaseOrderItem.objects.filter(product=product, purchase_order=purchase_order).first()
-        po_item = po_item if po_item else PurchaseOrderItem(product_id=prod_id, purchase_order=purchase_order, price=0,
-                                                            quantity=1, total=0)
-        po_item.price = product.price
-        po_item.total = po_item.quantity * po_item.price
-        po_item.save()
-        purchase_order.total = \
-            purchase_order.purchaseorderitems.filter(purchase_order=purchase_order).aggregate(total=Sum('total'))[
-                'total']
-        purchase_order.save()
+        empty_purchase_order = PurchaseOrder(user=user, total=0, date=datetime.datetime.now())
+        purchase_order = empty_purchase_order.add_purchase_order(request=request, po_id=po_id, product=product,
+                                                                 user=user)
         initial_data = []
         for purchase_order_item in purchase_order.purchaseorderitems.all():
             initial_data.append({'quantity': purchase_order_item.quantity, 'price': purchase_order_item.price})
         PurchaseOrderItemFormSet = modelformset_factory(PurchaseOrderItem, form=PurchaseOrderItemForm, can_delete=True,
                                                         extra=0, error_messages=False, )
         context = self.get_context_data(
-            **{'purchase_order': purchase_order, 'item': po_item, 'form': AddPurchaseOrderForm(request.POST),
+            **{'purchase_order': purchase_order, 'form': AddPurchaseOrderForm(request.POST),
                'purchase_order_item_formset': PurchaseOrderItemFormSet(initial=initial_data)})
         return self.render_to_response(context)
 
@@ -112,33 +118,41 @@ class EditPurchaseOrderItem(TemplateView):
 
     def post(self, request, *args, **kwargs):
         purchase_order_id = request.POST.get('po_id')
+        user = request.user
         prod_id = request.POST.get('prod_id')
         product = Product.objects.get(id=prod_id)
-        purchase_order = PurchaseOrder.objects.get(id=purchase_order_id)
-        purchase_order_item = PurchaseOrderItem.objects.get(purchase_order=purchase_order, product=product)
-        purchase_order_item.quantity = request.POST.get('quantity')
-        purchase_order_item.price = request.POST.get('price')
-        purchase_order_item.total = request.POST.get('subtotal')
-        purchase_order_item.save()
-        return HttpResponse(self.template_name)
-
-
-class DeletePurchaseItem(TemplateView):
-    template_name = 'inventory/includes/purchase_item_include.html'
-
-    def post(self, request, *args, **kwargs):
-        purchase_order_id = request.POST.get('po_id')
-        purchase_order_item_id = request.POST.get('item_id')
-        purchase_order = PurchaseOrder.objects.get(id=purchase_order_id)
-        po_item = PurchaseOrderItem.objects.get(purchase_order=purchase_order, id=purchase_order_item_id)
-        po_item.delete()
+        empty_purchase_order = PurchaseOrder(user=user, total=0, date=datetime.datetime.now())
+        purchase_order = empty_purchase_order.add_purchase_order(request=request, po_id=purchase_order_id,
+                                                                 product=product, user=user)
         initial_data = []
         for purchase_order_item in purchase_order.purchaseorderitems.all():
             initial_data.append({'quantity': purchase_order_item.quantity, 'price': purchase_order_item.price})
         PurchaseOrderItemFormSet = modelformset_factory(PurchaseOrderItem, form=PurchaseOrderItemForm, can_delete=True,
                                                         extra=0, error_messages=False, )
         context = self.get_context_data(
-            **{'purchase_order': purchase_order, 'item': po_item, 'form': AddPurchaseOrderForm(request.POST),
+            **{'purchase_order': purchase_order, 'form': AddPurchaseOrderForm(request.POST),
+               'purchase_order_item_formset': PurchaseOrderItemFormSet(initial=initial_data)})
+        return self.render_to_response(context)
+
+
+class DeletePurchaseItem(DeletionMixin, TemplateView):
+    template_name = 'inventory/includes/purchase_item_include.html'
+    success_url = reverse_lazy('add-purchase-order')
+
+    def post(self, request, *args, **kwargs):
+        purchase_order_id = request.POST.get('po_id')
+        purchase_order_item_id = request.POST.get('item_id')
+        user = request.user
+        empty_purchase_order = PurchaseOrder(user=user, total=0, date=datetime.datetime.now())
+        purchase_order = empty_purchase_order.delete_purchase_order(po_id=purchase_order_id,
+                                                                    item_id=purchase_order_item_id)
+        initial_data = []
+        for purchase_order_item in purchase_order.purchaseorderitems.all():
+            initial_data.append({'quantity': purchase_order_item.quantity, 'price': purchase_order_item.price})
+        PurchaseOrderItemFormSet = modelformset_factory(PurchaseOrderItem, form=PurchaseOrderItemForm, can_delete=True,
+                                                        extra=0, error_messages=False, )
+        context = self.get_context_data(
+            **{'purchase_order': purchase_order, 'form': AddPurchaseOrderForm(request.POST),
                'purchase_order_item_formset': PurchaseOrderItemFormSet(initial=initial_data)})
         return self.render_to_response(context)
 
@@ -190,6 +204,19 @@ class AddSuplierView(CreateView):
     model = Supplier
     form_class = AddSupplierForm
     template_name = 'inventory/add_supplier.html'
+    success_url = reverse_lazy('list-suppliers')
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        phone = request.POST.get('phone')
+        cust_1 = request.POST.get('supplier_custom_field_1')
+        cust_2 = request.POST.get('supplier_custom_field_2')
+        supplier = Supplier(user=user, name=name, email=email, phone=phone, supplier_custom_field_1=cust_1,
+                            supplier_custom_field_2=cust_2)
+        supplier.save()
+        return redirect(reverse_lazy('list-suppliers'))
 
 
 class SupplierListView(ListView):

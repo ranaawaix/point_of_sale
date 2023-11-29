@@ -1,5 +1,5 @@
 from django.contrib import admin
-from POS.models import Customer, Store, StoreProduct, Sale, SaleItem, Payment, Hold
+from POS.models import Customer, Store, StoreProduct, Sale, SaleItem, Payment, Hold, Register
 
 
 # Register your models here.
@@ -65,6 +65,11 @@ class PaymentAdmin(admin.ModelAdmin):
 @admin.register(Hold)
 class HoldAdmin(admin.ModelAdmin):
     list_display = ['reference_note', 'sale']
+
+
+@admin.register(Register)
+class RegisterAdmin(admin.ModelAdmin):
+    list_display = ['user', 'store', 'opening_cash_in_hand', 'closing_cash_in_hand', 'created_on', 'updated_on']
 
 
 admin.site.site_header = "SimplePOS"

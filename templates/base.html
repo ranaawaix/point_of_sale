@@ -68,8 +68,10 @@
                             </li>
                             <li><a href="{% url 'stores' %}"><i class="fa fa-tablet"></i> Stores </a>
                             </li>
-                            <li><a href="{% url 'create-sale' %}"><i class="fa fa-th"></i> POS </a>
+                            {% if register_id %}
+                            <li><a href="{% url 'create-sale' register_id %}"><i class="fa fa-th"></i> POS </a>
                             </li>
+                            {% endif %}
                             <li><a><i class="fa fa-barcode"></i> Products <span class="fa fa-chevron-down"></span></a>
                                 <ul class="nav child_menu">
                                     <li><a href="{% url 'list-products' %}">List Products</a></li>
@@ -207,7 +209,7 @@
                         {% endfor %}
                       <li class="nav-item">
                         <div class="text-center">
-                          <a class="dropdown-item">
+                          <a class="dropdown-item" href="{% url 'list-opened-bills' %}">
                             <strong>See All Alerts</strong>
                             <i class="fa fa-angle-right"></i>
                           </a>
@@ -215,14 +217,16 @@
                       </li>
                     </ul>
                   </li>
-                        <li><a class="px-4" href="{% url 'create-sale' %}" data-toggle="tooltip" title="POS"><i class="fa fa-th"></i> </a>
+                    {% if register_id %}
+                        <li><a class="px-4" href="{% url 'create-sale' register_id %}" data-toggle="tooltip" title="POS"><i class="fa fa-th"></i> </a>
                         </li>
-                        <li><a href="" data-toggle="tooltip" title="Customer Display"><i class="fa fa-desktop"></i></a>
+                    {% endif %}
+                        <li><a class="px-4" data-toggle="tooltip" title="Customer Display"><i class="fa fa-desktop"></i></a>
                         </li>
-                        <li><a class="px-4" href="" data-toggle="tooltip" title="Settings"><i
+                        <li><a href="" data-toggle="tooltip" title="Settings"><i
                                 class="fa fa-cogs"></i></a>
                         </li>
-                        <li><a href="" data-toggle="tooltip" title="Dashboard"><i class="fa fa-dashboard"></i></a>
+                        <li><a class="px-4" data-toggle="tooltip" title="Dashboard"><i class="fa fa-dashboard"></i></a>
                         </li>
                         <li class="hidden-xs hidden-sm px-4" id="datetime"><a href="" class="clock">{{ datetime }}</a>
                         </li>
@@ -240,7 +244,7 @@
         <!-- footer content -->
         <footer>
             <div class="pull-right">
-                A Project by <a href="https://colorlib.com">Rana Awais Ahmad</a>
+                A Project by <a href="#">Rana Awais Ahmad</a>
             </div>
             <div class="clearfix"></div>
         </footer>
@@ -252,6 +256,8 @@
     <script src="{% static 'vendors/jquery/dist/jquery.min.js' %}"></script>
     <script src="https://code.jquery.com/jquery-migrate-3.4.0.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <!-- Bootstrap -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
     <script src="{% static 'vendors/bootstrap/dist/js/bootstrap.bundle.min.js' %}"></script>

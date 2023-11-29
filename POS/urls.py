@@ -3,14 +3,15 @@ from POS import views
 
 urlpatterns = [
     path('stores', views.StoreListView.as_view(), name='stores'),
-    path('create_sale', views.POS.as_view(), name='create-sale'),
+    path('create_sale_register/<int:register_id>', views.POS.as_view(), name='create-sale'),
+    path('update_sale_item/', views.SaleItemUpdateView.as_view(), name='update-sale-item'),
     path('update_sale/<int:pk>', views.POSUpdateView.as_view(), name='update-sale'),
     path('delete_sale/<int:pk>', views.POSDeleteView.as_view(), name='delete-sale'),
     path('create_customer', views.AddCustomerView.as_view(), name='create-customer'),
     path('create_payment', views.PaymentView.as_view(), name='create-payment'),
     path('hold_sale', views.HoldOrderView.as_view(), name='hold-sale'),
     path('delete_saleitem', views.DeleteSaleItemView.as_view(), name='delete-saleitem'),
-    path('create_sale/<int:prod_id>', views.SaleView.as_view(), name='create-sale-product'),
+    path('create_sale_product/<int:prod_id>', views.SaleView.as_view(), name='create-sale-product'),
     path('create_store', views.AddStoreView.as_view(), name='create-store'),
     path('add_customer', views.AddCustomersView.as_view(), name='add-customer'),
     path('list_customers', views.ListCustomersView.as_view(), name='list-customers'),
@@ -23,4 +24,6 @@ urlpatterns = [
     path('list_products/<int:pk>', views.StoreWiseProductListView.as_view(), name='list-products-by-store'),
     path('list_sales', views.SaleListView.as_view(), name='list-sales'),
     path('list_opened_bills', views.OpenedBillsView.as_view(), name='list-opened-bills'),
+    path('select_store/<int:store_id>', views.StoreSelectView.as_view(), name='select-store'),
+    path('cash_in_hand', views.CashInHandView.as_view(), name='cash-in-hand'),
 ]

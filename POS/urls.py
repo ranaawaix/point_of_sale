@@ -26,4 +26,5 @@ urlpatterns = [
     path('list_opened_bills', views.OpenedBillsView.as_view(), name='list-opened-bills'),
     path('select_store/<int:store_id>', views.StoreSelectView.as_view(), name='select-store'),
     path('cash_in_hand', views.CashInHandView.as_view(), name='cash-in-hand'),
+    path('close_register', views.CloseRegisterView.as_view(), name='close_register'),
 ]

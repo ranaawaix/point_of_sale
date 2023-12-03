@@ -13,7 +13,7 @@ from user_accounts.models import User
 
 
 class Customer(models.Model):
-    name = models.CharField(max_length=250)
+    name = models.CharField(max_length=250, default='Walk-in Client')
     email = models.CharField(max_length=250, null=True, blank=True)
     phone = models.CharField(max_length=11, unique=True, null=True, blank=True)
     customer_custom_field_1 = models.CharField(max_length=250, null=True, blank=True)
@@ -81,7 +81,7 @@ class Sale(models.Model):
 
     def change_sale(self, request, product, quantity, sale_id=None, action=None):
         user = User.objects.get(id=request.user.id)
-        register = Register.objects.filter(user=user).first()
+        register = Register.objects.filter(user=user, status='O').first()
         if not sale_id:
             sale = Sale(total_items=0, user=user)
             sale.save()
@@ -137,11 +137,18 @@ class Sale(models.Model):
         return sale
 
 
+REGISTER_STATUS_CHOICES = [
+    ('O', 'Open'),
+    ('C', 'Close'),
+]
+
+
 class Register(models.Model):
     store = models.ForeignKey(Store, on_delete=models.CASCADE, related_name='pos')
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='pos')
     opening_cash_in_hand = models.IntegerField(null=True, blank=True)
     closing_cash_in_hand = models.IntegerField(null=True, blank=True)
+    status = models.CharField(choices=REGISTER_STATUS_CHOICES ,max_length=10)
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
 

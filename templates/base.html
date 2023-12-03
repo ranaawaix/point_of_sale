@@ -15,7 +15,8 @@
 
     <!-- Bootstrap -->
     <link href="{% static 'vendors/bootstrap/dist/css/bootstrap.min.css' %}" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <!-- Font Awesome -->
     <link href="{% static 'vendors/font-awesome/css/font-awesome.min.css' %}" rel="stylesheet">
     <!-- NProgress -->
@@ -68,9 +69,9 @@
                             </li>
                             <li><a href="{% url 'stores' %}"><i class="fa fa-tablet"></i> Stores </a>
                             </li>
-                            {% if register_id %}
-                            <li><a href="{% url 'create-sale' register_id %}"><i class="fa fa-th"></i> POS </a>
-                            </li>
+                            {% if reg %}
+                                <li><a href="{% url 'create-sale' reg.id %}"><i class="fa fa-th"></i> POS </a>
+                                </li>
                             {% endif %}
                             <li><a><i class="fa fa-barcode"></i> Products <span class="fa fa-chevron-down"></span></a>
                                 <ul class="nav child_menu">
@@ -89,7 +90,8 @@
                                     <li><a href="#">Import Categories</a></li>
                                 </ul>
                             </li>
-                            <li><a><i class="fa fa-shopping-cart"></i> Sales <span class="fa fa-chevron-down"></span></a>
+                            <li><a><i class="fa fa-shopping-cart"></i> Sales <span
+                                    class="fa fa-chevron-down"></span></a>
                                 <ul class="nav child_menu">
                                     <li><a href="{% url 'list-sales' %}">List Sales</a></li>
                                     <li><a href="{% url 'list-opened-bills' %}">List Opened Bills</a></li>
@@ -188,39 +190,43 @@
                         </li>
 
                         <li role="presentation" class="nav-item dropdown open show">
-                    <a href="javascript:" class="dropdown-toggle info-number" id="navbarDropdown1" data-toggle="dropdown" aria-expanded="false">
-                      <i class="fa fa-envelope-o"></i>
-                      <span class="badge bg-green">{{ notifications.count }}</span>
-                    </a>
-                    <ul class="dropdown-menu list-unstyled msg_list" role="menu" aria-labelledby="navbarDropdown1" x-placement="bottom-start" style="position: absolute; will-change: transform; top: 0; left: 0; transform: translate3d(-141px, 16px, 0px);">
-                        {% for notification in notifications %}
-                      <li class="nav-item">
-                        <a class="dropdown-item" href="{% url 'update-sale' notification.id %}">
-                          <span class="image"><img src="#" alt="Profile Image"></span>
-                          <span>
-                            <span>{{ user.username|capfirst}}</span>
-                            <span class="time">{{ notification.created_at}}</span>
+                            <a href="javascript:" class="dropdown-toggle info-number" id="navbarDropdown1"
+                               data-toggle="dropdown" aria-expanded="false">
+                                <i class="fa fa-envelope-o"></i>
+                                <span class="badge bg-green">{{ notifications.count }}</span>
+                            </a>
+                            <ul class="dropdown-menu list-unstyled msg_list" role="menu"
+                                aria-labelledby="navbarDropdown1" x-placement="bottom-start"
+                                style="position: absolute; will-change: transform; top: 0; left: 0; transform: translate3d(-141px, 16px, 0px);">
+                                {% for notification in notifications %}
+                                    <li class="nav-item">
+                                        <a class="dropdown-item" href="{% url 'update-sale' notification.id %}">
+                                            <span class="image"><img src="#" alt="Profile Image"></span>
+                                            <span>
+                            <span>{{ user.username|capfirst }}</span>
+                            <span class="time">{{ notification.created_at }}</span>
                           </span>
-                          <span class="message">
+                                            <span class="message">
                             {{ notification.holds.reference_note }}
                           </span>
-                        </a>
-                      </li>
-                        {% endfor %}
-                      <li class="nav-item">
-                        <div class="text-center">
-                          <a class="dropdown-item" href="{% url 'list-opened-bills' %}">
-                            <strong>See All Alerts</strong>
-                            <i class="fa fa-angle-right"></i>
-                          </a>
-                        </div>
-                      </li>
-                    </ul>
-                  </li>
-                    {% if register_id %}
-                        <li><a class="px-4" href="{% url 'create-sale' register_id %}" data-toggle="tooltip" title="POS"><i class="fa fa-th"></i> </a>
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                                <li class="nav-item">
+                                    <div class="text-center">
+                                        <a class="dropdown-item" href="{% url 'list-opened-bills' %}">
+                                            <strong>See All Alerts</strong>
+                                            <i class="fa fa-angle-right"></i>
+                                        </a>
+                                    </div>
+                                </li>
+                            </ul>
                         </li>
-                    {% endif %}
+                        {% if reg %}
+                            <li><a class="px-4" href="{% url 'create-sale' reg.id %}" data-toggle="tooltip" title="POS"><i
+                                    class="fa fa-th"></i> </a>
+                            </li>
+                        {% endif %}
                         <li><a class="px-4" data-toggle="tooltip" title="Customer Display"><i class="fa fa-desktop"></i></a>
                         </li>
                         <li><a href="" data-toggle="tooltip" title="Settings"><i
@@ -230,6 +236,13 @@
                         </li>
                         <li class="hidden-xs hidden-sm px-4" id="datetime"><a href="" class="clock">{{ datetime }}</a>
                         </li>
+                        {% if reg %}
+                            {% csrf_token %}
+                            <li><a id="CloseRegister" href="#"
+                                   data-regid="{{ reg.id }}" data-url="{% url 'close_register' %}" data-rurl="{% url 'stores' %}"><i
+                                    class="fa fa-close"></i> Close Register</a>
+                            </li>
+                        {% endif %}
                     </ul>
                 </nav>
             </div>
@@ -252,52 +265,58 @@
     </div>
 </div>
 <!-- jQuery -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-ajaxy/1.6.1/scripts/jquery.ajaxy.min.js" integrity="sha512-bztGAvCE/3+a1Oh0gUro7BHukf6v7zpzrAb3ReWAVrt+bVNNphcl2tDTKCBr5zk7iEDmQ2Bv401fX3jeVXGIcA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="{% static 'vendors/jquery/dist/jquery.min.js' %}"></script>
-    <script src="https://code.jquery.com/jquery-migrate-3.4.0.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-ajaxy/1.6.1/scripts/jquery.ajaxy.min.js"
+        integrity="sha512-bztGAvCE/3+a1Oh0gUro7BHukf6v7zpzrAb3ReWAVrt+bVNNphcl2tDTKCBr5zk7iEDmQ2Bv401fX3jeVXGIcA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="{% static 'vendors/jquery/dist/jquery.min.js' %}"></script>
+<script src="https://code.jquery.com/jquery-migrate-3.4.0.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
+        integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <!-- Bootstrap -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
-    <script src="{% static 'vendors/bootstrap/dist/js/bootstrap.bundle.min.js' %}"></script>
-    <!-- FastClick -->
-    <script src="{% static 'vendors/fastclick/lib/fastclick.js' %}"></script>
-    <!-- NProgress -->
-    <script src="{% static 'vendors/nprogress/nprogress.js' %}"></script>
-    <!-- Chart.js -->
-    <script src="{% static 'vendors/Chart.js/dist/Chart.min.js' %}"></script>
-    <!-- gauge.js -->
-    <script src="{% static 'vendors/gauge.js/dist/gauge.min.js' %}"></script>
-    <!-- bootstrap-progressbar -->
-    <script src="{% static 'vendors/bootstrap-progressbar/bootstrap-progressbar.min.js' %}"></script>
-    <!-- iCheck -->
-    <script src="{% static 'vendors/iCheck/icheck.min.js' %}"></script>
-    <!-- Skycons -->
-    <script src="{% static 'vendors/skycons/skycons.js' %}"></script>
-    <!-- Flot -->
-    <script src="{% static 'vendors/Flot/jquery.flot.js' %}"></script>
-    <script src="{% static 'vendors/Flot/jquery.flot.pie.js' %}"></script>
-    <script src="{% static 'vendors/Flot/jquery.flot.time.js' %}"></script>
-    <script src="{% static 'vendors/Flot/jquery.flot.stack.js' %}"></script>
-    <script src="{% static 'vendors/Flot/jquery.flot.resize.js' %}"></script>
-    <!-- Flot plugins -->
-    <script src="{% static 'vendors/flot.orderbars/js/jquery.flot.orderBars.js' %}"></script>
-    <script src="{% static 'vendors/flot-spline/js/jquery.flot.spline.min.js' %}"></script>
-    <script src="{% static 'vendors/flot.curvedlines/curvedLines.js' %}"></script>
-    <!-- DateJS -->
-    <script src="{% static 'vendors/DateJS/build/date.js' %}"></script>
-    <!-- JQVMap -->
-    <script src="{% static 'vendors/jqvmap/dist/jquery.vmap.js' %}"></script>
-    <script src="{% static 'vendors/jqvmap/dist/maps/jquery.vmap.world.js' %}"></script>
-    <script src="{% static 'vendors/jqvmap/examples/js/jquery.vmap.sampledata.js' %}"></script>
-    <!-- bootstrap-daterangepicker -->
-    <script src="{% static 'vendors/moment/min/moment.min.js' %}"></script>
-    <script src="{% static 'vendors/bootstrap-daterangepicker/daterangepicker.js' %}"></script>
+<!-- Bootstrap -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+<script src="{% static 'vendors/bootstrap/dist/js/bootstrap.bundle.min.js' %}"></script>
+<!-- FastClick -->
+<script src="{% static 'vendors/fastclick/lib/fastclick.js' %}"></script>
+<!-- NProgress -->
+<script src="{% static 'vendors/nprogress/nprogress.js' %}"></script>
+<!-- Chart.js -->
+<script src="{% static 'vendors/Chart.js/dist/Chart.min.js' %}"></script>
+<!-- gauge.js -->
+<script src="{% static 'vendors/gauge.js/dist/gauge.min.js' %}"></script>
+<!-- bootstrap-progressbar -->
+<script src="{% static 'vendors/bootstrap-progressbar/bootstrap-progressbar.min.js' %}"></script>
+<!-- iCheck -->
+<script src="{% static 'vendors/iCheck/icheck.min.js' %}"></script>
+<!-- Skycons -->
+<script src="{% static 'vendors/skycons/skycons.js' %}"></script>
+<!-- Flot -->
+<script src="{% static 'vendors/Flot/jquery.flot.js' %}"></script>
+<script src="{% static 'vendors/Flot/jquery.flot.pie.js' %}"></script>
+<script src="{% static 'vendors/Flot/jquery.flot.time.js' %}"></script>
+<script src="{% static 'vendors/Flot/jquery.flot.stack.js' %}"></script>
+<script src="{% static 'vendors/Flot/jquery.flot.resize.js' %}"></script>
+<!-- Flot plugins -->
+<script src="{% static 'vendors/flot.orderbars/js/jquery.flot.orderBars.js' %}"></script>
+<script src="{% static 'vendors/flot-spline/js/jquery.flot.spline.min.js' %}"></script>
+<script src="{% static 'vendors/flot.curvedlines/curvedLines.js' %}"></script>
+<!-- DateJS -->
+<script src="{% static 'vendors/DateJS/build/date.js' %}"></script>
+<!-- JQVMap -->
+<script src="{% static 'vendors/jqvmap/dist/jquery.vmap.js' %}"></script>
+<script src="{% static 'vendors/jqvmap/dist/maps/jquery.vmap.world.js' %}"></script>
+<script src="{% static 'vendors/jqvmap/examples/js/jquery.vmap.sampledata.js' %}"></script>
+<!-- bootstrap-daterangepicker -->
+<script src="{% static 'vendors/moment/min/moment.min.js' %}"></script>
+<script src="{% static 'vendors/bootstrap-daterangepicker/daterangepicker.js' %}"></script>
 
-    <!-- Custom Theme Scripts -->
-    <script src="{% static 'build/js/custom.min.js' %}"></script>
-    <script>
+<!-- Custom Theme Scripts -->
+<script src="{% static 'build/js/custom.min.js' %}"></script>
+<script>
     function updateCurrentTime() {
         const currentTimeElement = document.getElementById('datetime');
         const updateInterval = 1000;
@@ -357,7 +376,26 @@
     }).prop('checked', false);
 
 </script>
-
+<script>
+    $('#CloseRegister').on('click', function (e) {
+        e.preventDefault()
+        var register_id = $('#CloseRegister').data('regid')
+        var url = $(this).data('url')
+        var rurl = $(this).data('rurl')
+        let csrf = $("input[name=csrfmiddlewaretoken]").val();
+        var my_data = {register_id: register_id, csrfmiddlewaretoken: csrf}
+        console.log(my_data)
+        $.ajax({
+            url: url,
+            method: 'POST',
+            data: my_data,
+            success: function (rsp) {
+                console.log(rsp)
+                rsp.success(window.location.href=rurl)
+            }
+        })
+    })
+</script>
 
 {% block scripts %}
 

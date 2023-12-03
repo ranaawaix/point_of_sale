@@ -119,7 +119,7 @@
             <div class="modal-body">
                 <form action="{% url 'hold-sale' %}" method="POST" novalidate role="form" class="holdForm">
                     {% csrf_token %}
-                    <input id="SaleID" type="hidden" data-url="{% url 'hold-sale' %}" data-slid="{{ sale.id }}">
+                    <input id="SaleID" type="hidden" data-url="{% url 'hold-sale' %}" data-slid="{{ sale.id }}" data-rurl="{% url 'list-opened-bills' %}">
                     <div class="x_content bs-example-popovers">
 
                         <div id="msg" class="alert alert-primary alert-dismissible " role="alert" style="display: none">
@@ -271,7 +271,7 @@
                               class="paymentForm">
                             {% csrf_token %}
                             <input id="Saleid" type="hidden" data-url="{% url 'create-payment' %}"
-                                   data-saleId="{{ sale.id }}">
+                                   data-saleId="{{ sale.id }}" data-rurl="{% url 'list-sales' %}">
                             <div class="x_content bs-example-popovers">
 
                                 <div id="msgp" class="alert alert-primary alert-dismissible " role="alert"
@@ -329,6 +329,7 @@
             let note = $(this).find('#id_reference_note').val();
             let csrf = $("input[name=csrfmiddlewaretoken]").val();
             let url = $('#SaleID').data('url');
+            let rurl = $('#SaleID').data('rurl');
             console.log(sale_id, note);
             let my_data = {sale_id: sale_id, note: note, csrfmiddlewaretoken: csrf}
             $.ajax({
@@ -341,6 +342,7 @@
                             $('#modalHold').modal('hide');
                         }, 5000);
                         $('.modal-backdrop').removeClass('modal-backdrop fade');
+                        data.success(window.location.href=rurl)
                     } else if (data.status === 0) {
                         $('#modalHold').modal('show');
                         $("#msgfail strong").text("Unable to Hold order");
@@ -404,6 +406,7 @@
             e.preventDefault();
             let sale_id = $('#saleId').data('sid');
             let url = $('#Saleid').data('url');
+            let rurl = $('#Saleid').data('rurl');
             let note = $(this).find('#id_note').val();
             let amount = $(this).find('#id_amount').val();
             let payment_by = $(this).find('#id_payment_by').val();
@@ -428,6 +431,7 @@
                             $('#modalPayment').modal('hide');
                         }, 5000);
                         $('.modal-backdrop').removeClass('modal-backdrop fade');
+                        rsp.success(window.location.href=rurl);
                     } else if (rsp.status === 0) {
                         $('#modalPayment').modal('show');
                         $("#msgpfail strong").text("Unable to submit payment");

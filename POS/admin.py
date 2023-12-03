@@ -69,7 +69,7 @@ class HoldAdmin(admin.ModelAdmin):
 
 @admin.register(Register)
 class RegisterAdmin(admin.ModelAdmin):
-    list_display = ['user', 'store', 'opening_cash_in_hand', 'closing_cash_in_hand', 'created_on', 'updated_on']
+    list_display = ['user', 'store', 'opening_cash_in_hand', 'closing_cash_in_hand', 'status', 'created_on', 'updated_on']
 
 
 admin.site.site_header = "SimplePOS"

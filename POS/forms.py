@@ -35,7 +35,7 @@ class AddCustomerForm(forms.ModelForm):
         fields = ['name', 'email', 'phone', 'customer_custom_field_1', 'customer_custom_field_2']
         widgets = {'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Customer Name'}),
                    'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Customer Email'}),
-                   'phone': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Customer Phone'}),
+                   'phone': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Customer Phone'}),
                    'customer_custom_field_1': forms.Textarea(
                        attrs={'class': 'form-control', 'placeholder': 'Customer Extra Detail 1'}),
                    'customer_custom_field_2': forms.Textarea(

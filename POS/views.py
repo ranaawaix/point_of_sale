@@ -1,6 +1,5 @@
-import datetime
-
 from cities_light.models import City, Country
+from django.contrib import messages
 from django.db.models import Sum
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render, redirect
@@ -9,10 +8,9 @@ from django.views import View
 from django.views.generic import ListView, CreateView, TemplateView, UpdateView, DeleteView
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.list import MultipleObjectMixin, MultipleObjectTemplateResponseMixin
-from django.contrib import messages
 from POS.forms import SaleForm, HoldOrderForm, AddCustomerForm, PaymentForm, AddStoreForm, AddProductForm, \
     StoreProductForm, CashInHandForm
-from POS.models import Store, SaleItem, Sale, Hold, Customer, Payment, StoreProduct, Register
+from POS.models import Store, Sale, Hold, Customer, Payment, StoreProduct, Register
 from user_accounts.models import User
 
 
@@ -57,34 +55,11 @@ class SaleView(TemplateView):
     template_name = 'includes/pos_include.html'
 
     def post(self, request, prod_id):
-        # register_id = request.POST.get('register_id')
-        # register = Register.objects.get(id=register_id)
         sale_id = self.request.POST.get('sale_id')
         product = Product.objects.get(id=prod_id)
         user = request.user
         empty_sale = Sale(user=user, total_items=0, total_price=0)
         sale = empty_sale.add_sale(request=request, product=product, sale_id=sale_id)
-        # if not sale_id:
-        #     sale = Sale(total_items=0, status='H', user=user)
-        #     sale.save()
-        # else:
-        #     sale = get_object_or_404(Sale.objects.filter(id=sale_id))
-        # product = Product.objects.get(id=prod_id)
-        # item = SaleItem.objects.filter(product=product, sale=sale).first()
-        # item = item if item else SaleItem(sale=sale, product=product, quantity=0)
-        # item.quantity += 1
-        # item.price = product.price
-        # item.total = item.quantity * item.price
-        # item.register = register
-        # item.save()
-        # if item:
-        #     sale.user = user
-        #     sale.total_items = sale.saleitems.count()
-        #     sale.total_price = sale.saleitems.filter(sale=sale).aggregate(total_price=Sum('total'))['total_price']
-        #     sale.total_payable = (sale.total_price + sale.order_tax) - sale.discount
-        #     sale.save()
-        # else:
-        #     sale.delete()
         context = self.get_context_data(
             **{'sale': sale, 'form': SaleForm(request.POST), 'holdform': HoldOrderForm(request.POST),
                'customerform': AddCustomerForm(request.POST), 'paymentform': PaymentForm(request.POST)})
@@ -95,27 +70,12 @@ class SaleItemUpdateView(TemplateView):
     template_name = 'includes/pos_include.html'
 
     def post(self, request, *args, **kwargs):
-        register_id = request.POST.get('register_id')
-        register = Register.objects.get(id=register_id)
         prod_id = request.POST.get('prod_id')
-        sale_id = self.request.POST.get('sale_id')
-        user = request.user
-        sale = get_object_or_404(Sale.objects.filter(id=sale_id))
         product = Product.objects.get(id=prod_id)
-        item = sale.saleitems.get(product=product, sale=sale)
-        item.quantity = int(request.POST.get('quantity'))
-        item.price = int(request.POST.get('price'))
-        item.total = int(request.POST.get('subtotal'))
-        item.register = register
-        item.save()
-        if item:
-            sale.user = user
-            sale.total_items = sale.saleitems.count()
-            sale.total_price = sale.saleitems.filter(sale=sale).aggregate(total_price=Sum('total'))['total_price']
-            sale.total_payable = (sale.total_price + sale.order_tax) - sale.discount
-            sale.save()
-        else:
-            sale.delete()
+        sale_id = self.request.POST.get('sale_id')
+        quantity = int(request.POST.get('quantity'))
+        current_sale = Sale(id=sale_id)
+        sale = current_sale.change_sale(request=request, product=product, quantity=quantity, sale_id=sale_id)
         context = self.get_context_data(
             **{'sale': sale, 'form': SaleForm(request.POST), 'holdform': HoldOrderForm(request.POST),
                'customerform': AddCustomerForm(request.POST), 'paymentform': PaymentForm(request.POST)})
@@ -125,6 +85,7 @@ class SaleItemUpdateView(TemplateView):
 class HoldOrderView(CreateView):
     model = Hold
     form_class = HoldOrderForm
+    success_url = reverse_lazy('list-opened-bills')
 
     def post(self, request, *args, **kwargs):
         sale_id = request.POST.get('sale_id')
@@ -324,24 +285,6 @@ class AddProductView(CreateView):
             context['storeproductformset'] = self.get_store_product_formset()
         return context
 
-    # def post(self, request, *args, **kwargs):
-    #     user_id = request.user.id
-    #     user = User.objects.get(id=user_id)
-    #     type_id = request.POST.get('type')
-    #     type = ProductType.objects.get(id=type_id)
-    #     name = request.POST.get('name')
-    #     code = request.POST.get('code')
-    #     barcode_id = request.POST.get('barcode_symbology')
-    #     barcode_symbology = Barcode.objects.get(id=barcode_id)
-    #     category_id = request.POST.get('category')
-    #     category = Category.objects.get(id=category_id)
-    #     cost = request.POST.get('cost')
-    #     price = request.POST.get('price')
-    #     product_tax = request.POST.get('product_tax')
-    #     tax_method = request.POST.get('tax_method')
-    #     alert_quantity = request.POST.get('alert_quantity')
-    #     details = request.POST.get('details')
-
     def form_valid(self, form):
         context = self.get_context_data()
         formset = context['storeproductformset']
@@ -427,9 +370,6 @@ class POSUpdateView(UpdateView):
         context['paymentform'] = PaymentForm(self.request.POST or None, instance=self.object)
         return context
 
-    def post(self, request, *args, **kwargs):
-        pass
-
 
 class POSDeleteView(DeleteView):
     model = Sale
@@ -438,7 +378,6 @@ class POSDeleteView(DeleteView):
 
 
 class StoreSelectView(SingleObjectMixin, View):
-    model = POS
 
     def get(self, request, store_id):
         stores = Store.objects.all()
@@ -448,7 +387,7 @@ class StoreSelectView(SingleObjectMixin, View):
         user_id = user.id
         store_user_id = user.stores.instance.id
         if user_id == store_user_id:
-            selected_store = Register(store=store, user=user)
+            selected_store = Register(store=store, user=user, status='O')
             selected_store.save()
             return render(request, template_name='POS/register.html',
                           context={'selected_store': selected_store, 'form': form})
@@ -467,13 +406,11 @@ class CashInHandView(CreateView):
         store_id = request.POST.get('store_id')
         store = Store.objects.get(id=store_id)
         register_id = request.POST.get('register_id')
-        register = Register(id=register_id, user=user, store=store)
+        register = Register.objects.get(id=register_id, user=user, store=store)
         cash_in_hand = request.POST.get('opening_cash_in_hand')
         form = CashInHandForm(self.request.POST)
         if cash_in_hand is not '':
             register.opening_cash_in_hand = cash_in_hand
-            register.created_on = datetime.datetime.now()
-            register.updated_on = datetime.datetime.now()
             register.save()
             return redirect('create-sale', register_id=register_id)
         else:
@@ -481,3 +418,14 @@ class CashInHandView(CreateView):
                            'Please enter the opening cash in hand amount. Enter "0" if no opening amount.')
             return render(request, template_name='POS/register.html',
                           context={'selected_store': register, 'form': form})
+
+
+class CloseRegisterView(View):
+
+    def post(self, request):
+        register_id = request.POST.get('register_id')
+        register = Register.objects.get(id=register_id)
+        register.closing_cash_in_hand = register.saleitems.filter(register_id=register_id).aggregate(closing_cash_in_hand=Sum('total'))['closing_cash_in_hand']
+        register.status = 'C'
+        register.save()
+        return redirect('stores')

@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}
+Confirm Delete
+{% endblock %}
+{% block content %}
+        <section class="section">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title text-center">Confirm Delete</h5>
+                            <p class="text-center mt-2">Are you sure you want to delete?</p>
+                            <form class='text-center' action="" method='POST'>
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger mx-3">Yes</button>
+                                <button class="btn btn-primary"><a class="text-white" href="{% url 'list-purchase-orders' %}">No</a>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+{% endblock %}

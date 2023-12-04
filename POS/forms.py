@@ -56,7 +56,7 @@ class AddStoreForm(forms.ModelForm):
     class Meta:
         model = Store
         fields = ['name', 'code', 'logo', 'email', 'phone', 'address', 'city', 'country', 'postal_code',
-                  'receipt_header', 'receipt_footer']
+                  'receipt_header', 'receipt_footer', 'user']
         widgets = {'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Store Name'}),
                    'code': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Store Code'}),
                    'logo': forms.ClearableFileInput(attrs={'class': 'form-control'}),
@@ -68,7 +68,8 @@ class AddStoreForm(forms.ModelForm):
                 attrs={'class': 'form-control', 'placeholder': 'Store Postal Code'}), 'receipt_header': forms.Textarea(
                 attrs={'class': 'form-control', 'placeholder': 'Receipt Header Text'}),
                    'receipt_footer': forms.Textarea(
-                       attrs={'class': 'form-control', 'placeholder': 'Receipt Footer Text'}), }
+                       attrs={'class': 'form-control', 'placeholder': 'Receipt Footer Text'}),
+                   'user': forms.SelectMultiple(attrs={'class': 'form-control'})}
 
 
 class AddProductForm(forms.ModelForm):

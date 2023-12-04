@@ -1,16 +1,20 @@
 from cities_light.models import City, Country
 from django.contrib import messages
 from django.db.models import Sum
+from django.forms.models import inlineformset_factory, modelformset_factory
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import ListView, CreateView, TemplateView, UpdateView, DeleteView
+from django.views.generic import ListView, TemplateView, UpdateView, DeleteView
 from django.views.generic.detail import SingleObjectMixin
+from django.views.generic.edit import CreateView
 from django.views.generic.list import MultipleObjectMixin, MultipleObjectTemplateResponseMixin
 from POS.forms import SaleForm, HoldOrderForm, AddCustomerForm, PaymentForm, AddStoreForm, AddProductForm, \
     StoreProductForm, CashInHandForm
-from POS.models import Store, Sale, Hold, Customer, Payment, StoreProduct, Register
+from POS.models import Sale, Hold, Customer, Payment, Register
+from POS.models import Store, StoreProduct
+from inventory.models import Product
 from user_accounts.models import User
 
 
@@ -176,8 +180,7 @@ class AddStoreView(CreateView):
     success_url = reverse_lazy('stores')
 
     def post(self, request, *args, **kwargs):
-        user_id = request.user.id
-        user = User.objects.get(id=user_id)
+        user = request.POST.get('user')
         name = request.POST.get('name')
         city_id = request.POST.get('city')
         city = City.objects.get(id=city_id)
@@ -191,10 +194,11 @@ class AddStoreView(CreateView):
         email = request.POST.get('email')
         phone = request.POST.get('phone')
         address = request.POST.get('address')
-        store = Store(user=user, name=name, code=code, city=city, country=country, postal_code=postal_code,
+        store = Store(name=name, code=code, city=city, country=country, postal_code=postal_code,
                       receipt_header=receipt_header, receipt_footer=receipt_footer, logo=logo, email=email, phone=phone,
                       address=address)
         store.save()
+        store.user.add(user)
         return redirect(self.success_url)
 
 
@@ -247,13 +251,6 @@ class StoreWiseProductListView(MultipleObjectTemplateResponseMixin, MultipleObje
         self.queryset = StoreProduct.objects.filter(store=store)
         return render(request, template_name=self.template_name,
                       context={'stores': stores, 'store': store, 'storeproducts': self.queryset})
-
-
-from django.forms.models import inlineformset_factory, modelformset_factory
-from django.views.generic.edit import CreateView
-from django.urls import reverse_lazy
-from inventory.models import Product
-from POS.models import Store, StoreProduct
 
 
 class AddProductView(CreateView):
@@ -425,7 +422,9 @@ class CloseRegisterView(View):
     def post(self, request):
         register_id = request.POST.get('register_id')
         register = Register.objects.get(id=register_id)
-        register.closing_cash_in_hand = register.saleitems.filter(register_id=register_id).aggregate(closing_cash_in_hand=Sum('total'))['closing_cash_in_hand']
+        register.closing_cash_in_hand = \
+            register.saleitems.filter(register_id=register_id).aggregate(closing_cash_in_hand=Sum('total'))[
+                'closing_cash_in_hand']
         register.status = 'C'
         register.save()
         return redirect('stores')

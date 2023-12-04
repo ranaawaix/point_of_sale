@@ -58,13 +58,14 @@
                                                             <div class="btn-group btn-group-xs" role="group">
                                                                 <a class="tip btn btn-warning btn-xs"
                                                                    title="Edit Category"
-                                                                   href=""><i
+                                                                   href="{% url 'update-purchase-order' purchase_order.id %}"><i
                                                                         class="fa fa-edit"></i></a>
                                                             </div>
                                                             <div class="btn-group btn-group-xs" role="group">
                                                                 <a class="tip btn btn-danger btn-xs"
                                                                    title="Delete Category"
-                                                                   href=""><i class="fa fa-trash-o"></i></a>
+                                                                   href="{% url 'delete-purchase-order' purchase_order.id %}"><i
+                                                                        class="fa fa-trash-o"></i></a>
                                                             </div>
                                                         </div>
                                                     </td>

@@ -1,18 +1,14 @@
 import datetime
-
-from django.views.generic.edit import DeletionMixin
-
-from user_accounts.models import User
-from django.db.models import Sum
 from django.forms import modelformset_factory
-from django.http import HttpResponse
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, TemplateView
+from django.views.generic.edit import DeletionMixin
 from POS.models import Product
 from inventory.forms import AddCategoriesForm, AddPurchaseOrderForm, PurchaseOrderItemForm, AddExpenseForm, \
     AddSupplierForm
 from inventory.models import Category, PurchaseOrder, PurchaseOrderItem, Supplier, Expense
+from user_accounts.models import User
 
 
 # Create your views here.
@@ -157,14 +153,35 @@ class DeletePurchaseItem(DeletionMixin, TemplateView):
         return self.render_to_response(context)
 
 
-# class UpdatePurchaseOrderView(UpdateView):
-#     model = PurchaseOrder
-#     form_class = AddPurchaseOrderForm
-#     template_name = 'inventory/add_purchase.html'
+class UpdatePurchaseOrderView(UpdateView):
+    model = PurchaseOrder
+    form_class = AddPurchaseOrderForm
+    template_name = 'inventory/update_purchase.html'
+    success_url = reverse_lazy('list-purchase-orders')
+
+    def get_context_data(self, **kwargs):
+        self.object = self.get_object()
+        parent_instance = PurchaseOrderItem.objects.filter(purchase_order=self.object)
+        initial_data = []
+        for instance in parent_instance:
+            dict = {'product': instance.product, 'quantity': instance.quantity, 'price': instance.price, 'total': instance.total}
+            initial_data.append(dict)
+        context = super().get_context_data(object=self.object)
+        purchase_order_item_formset = modelformset_factory(PurchaseOrderItem, form=PurchaseOrderItemForm, can_delete=True,
+                                                        extra=len(initial_data), error_messages=False, )
+        if self.request.POST:
+            context['purchase_order_item_formset'] = purchase_order_item_formset(self.request.POST, initial=initial_data)
+        else:
+            context['purchase_order_item_formset'] = purchase_order_item_formset(initial=initial_data)
+        context['purchase_order'] = self.object
+        return context
 
 
-# class DeletePurchaseOrderView(DeleteView):
-#     model = PurchaseOrder
+class DeletePurchaseOrderView(DeleteView):
+    model = PurchaseOrder
+    template_name = 'inventory/confirm_delete_purchase.html'
+    success_url = reverse_lazy('list-purchase-orders')
+
 
 
 class PurchaseOrderListView(ListView):

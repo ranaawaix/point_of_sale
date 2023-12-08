@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+{% block title %}
+    Top Products
+{% endblock %}
+{% block charts %}
+    <script>
+        google.charts.load('current', {packages: ['corechart']});
+        google.charts.setOnLoadCallback(drawChart);
+
+        function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+          ['Product Name', 'Total Sold'],
+            {% for product in current_month_products %}
+            ['{{ product.product__name }}', {{ product.quantity }}],
+          {% endfor %}
+        ]);
+
+            var options = {
+                title: "This month's Top Products",
+                height: 300,
+                legend: { position: "top" },
+            };
+
+            // Instantiate and draw the chart.
+            var chart = new google.visualization.ColumnChart(document.getElementById('myMonthChart'));
+            chart.draw(data, options);
+        }
+    </script>
+    <script>
+        google.charts.load('current', {packages: ['corechart']});
+        google.charts.setOnLoadCallback(drawChart);
+
+        function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+          ['Product Name', 'Total Sold'],
+            {% for product in last_month_products %}
+            ['{{ product.product__name }}', {{ product.quantity }}],
+          {% endfor %}
+        ]);
+
+            var options = {
+                title: "Last month's Top Products",
+                height: 300,
+                legend: { position: "top" },
+            };
+
+            // Instantiate and draw the chart.
+            var chart = new google.visualization.ColumnChart(document.getElementById('myLastMonthChart'));
+            chart.draw(data, options);
+        }
+    </script>
+    <script>
+        google.charts.load('current', {packages: ['corechart']});
+        google.charts.setOnLoadCallback(drawChart);
+
+        function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+          ['Product Name', 'Total Sold'],
+            {% for product in previous_three_months_products %}
+            ['{{ product.product__name }}', {{ product.quantity }}],
+          {% endfor %}
+        ]);
+
+            var options = {
+                title: "Last three month's Top Products",
+                height: 300,
+                legend: { position: "top" },
+            };
+
+            // Instantiate and draw the chart.
+            var chart = new google.visualization.ColumnChart(document.getElementById('myThreeMonthChart'));
+            chart.draw(data, options);
+        }
+    </script>
+    <script>
+        google.charts.load('current', {packages: ['corechart']});
+        google.charts.setOnLoadCallback(drawChart);
+
+        function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+          ['Product Name', 'Total Sold'],
+            {% for product in last_twelve_months_products %}
+            ['{{ product.product__name }}', {{ product.quantity }}],
+          {% endfor %}
+        ]);
+
+            var options = {
+                title: "Last twelve month's Top Products",
+                height: 300,
+                legend: { position: "top" },
+            };
+
+            // Instantiate and draw the chart.
+            var chart = new google.visualization.ColumnChart(document.getElementById('myTwelveMonthChart'));
+            chart.draw(data, options);
+        }
+    </script>
+{% endblock %}
+{% block content %}
+    <div class="right_col" role="main">
+        <div class="">
+            <div class="page-title">
+                <div class="title_left">
+                    <h3>Top Products</h3>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+            <div class="row">
+                <div class="col-md-12 col-sm-12 ">
+                    <div class="x_panel">
+                        <div class="x_title">
+                            <h2>Please review the top products charts below</h2>
+                            <ul class="nav navbar-right panel_toolbox">
+                                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                </li>
+                            </ul>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content">
+                            <br/>
+                            <div class="row">
+                                <div class="col-md-6 col-sm-6  ">
+                                    <div class="x_panel">
+                                        <div class="x_title">
+                                            This Month ({{ current_month }} - {{ current_year }})
+                                        </div>
+                                        <div class="x_content">
+                                            <div id="myMonthChart"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-sm-6  ">
+                                    <div class="x_panel">
+                                        <div class="x_title">
+                                            Last Month ({{ last_month }} - {{ current_year }})
+                                        </div>
+                                        <div class="x_content">
+                                            <div id="myLastMonthChart" style="height: 300px"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="x_content">
+                            <br/>
+                            <div class="row">
+                                <div class="col-md-6 col-sm-6  ">
+                                    <div class="x_panel">
+                                        <div class="x_title">
+                                            Last 3 Months (From {{ last_three_month }} - {{ current_year }})
+                                        </div>
+                                        <div class="x_content">
+                                            <div id="myThreeMonthChart"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-sm-6  ">
+                                    <div class="x_panel">
+                                        <div class="x_title">
+                                            Last 12 Months (From {{ month_12_months_ago }} - {{ year_12_months_ago }})
+                                        </div>
+                                        <div class="x_content">
+                                            <div id="myTwelveMonthChart" style="height: 300px"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

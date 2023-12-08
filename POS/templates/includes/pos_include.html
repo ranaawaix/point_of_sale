@@ -271,7 +271,7 @@
                               class="paymentForm">
                             {% csrf_token %}
                             <input id="Saleid" type="hidden" data-url="{% url 'create-payment' %}"
-                                   data-saleId="{{ sale.id }}" data-rurl="{% url 'list-sales' %}">
+                                   data-saleId="{{ sale.id }}" data-regId="{{ reg.id }}" data-rurl="{% url 'list-sales' %}">
                             <div class="x_content bs-example-popovers">
 
                                 <div id="msgp" class="alert alert-primary alert-dismissible " role="alert"
@@ -407,14 +407,16 @@
             let sale_id = $('#saleId').data('sid');
             let url = $('#Saleid').data('url');
             let rurl = $('#Saleid').data('rurl');
+            let reg_id = $('#Saleid').data('regid');
             let note = $(this).find('#id_note').val();
             let amount = $(this).find('#id_amount').val();
             let payment_by = $(this).find('#id_payment_by').val();
             let payment_note = $(this).find('#id_payment_note').val();
             let csrf = $("input[name=csrfmiddlewaretoken]").val();
-            console.log(note, amount, payment_by, payment_note, sale_id);
+            console.log(note, amount, payment_by, payment_note, sale_id, reg_id);
             let my_data = {
                 sale_id: sale_id,
+                reg_id: reg_id,
                 note: note,
                 amount: amount,
                 payment_by: payment_by,

@@ -20,17 +20,16 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="popper.js" level="application" />
     <orderEntry type="library" name="jquery-3.7.0" level="application" />
-    <orderEntry type="library" name="jquery" level="application" />
     <orderEntry type="library" name="@popperjs/core" level="application" />
-    <orderEntry type="library" name="bootstrap" level="application" />
-    <orderEntry type="library" name="jquery" level="application" />
-    <orderEntry type="library" name="bootstrap" level="application" />
-    <orderEntry type="library" name="@popperjs/core" level="application" />
-    <orderEntry type="library" name="jquery-3.7.1.slim" level="application" />
-    <orderEntry type="library" name="jquery-migrate-1.4.1" level="application" />
     <orderEntry type="library" name="jquery-migrate-3.4.0" level="application" />
+    <orderEntry type="library" name="jquery-migrate-1.4.1" level="application" />
     <orderEntry type="library" name="jquery-ajaxy" level="application" />
     <orderEntry type="library" name="sweetalert2" level="application" />
+    <orderEntry type="library" name="loader" level="application" />
+    <orderEntry type="library" name="jquery-3.7.1.slim" level="application" />
+    <orderEntry type="library" name="bootstrap" level="application" />
+    <orderEntry type="library" name="jquery" level="application" />
+    <orderEntry type="library" name="bootstrap" level="application" />
   </component>
   <component name="PyDocumentationSettings">
     <option name="format" value="PLAIN" />

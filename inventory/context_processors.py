@@ -18,8 +18,8 @@ def notifications(request):
 
 def reg(request):
     user = request.user
-    reg = Register.objects.filter(user=user, status='O').first()
-    print(reg)
-    return {
-        'reg': reg
-    }
+    if not user.is_anonymous:
+        reg = Register.objects.filter(user=user, status='O').first()
+        return {'reg': reg}
+    else:
+        return {'reg': None}

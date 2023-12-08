@@ -25,6 +25,7 @@ class User(AbstractUser):
     phone = models.CharField(max_length=12, null=True, blank=True)
     gender = models.CharField(choices=GENDER_CHOICES, max_length=250, default='M', null=True, blank=True)
     status = models.CharField(choices=STATUS_CHOICES, max_length=250, default='Active', null=True, blank=True)
+    avatar = models.ImageField(upload_to='media', null=True, blank=True)
 
     def __str__(self):
         return f'{self.id}-{self.username}'

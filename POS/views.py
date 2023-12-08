@@ -1,3 +1,5 @@
+import calendar
+import datetime
 from cities_light.models import City, Country
 from django.contrib import messages
 from django.db.models import Sum
@@ -11,10 +13,11 @@ from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import CreateView
 from django.views.generic.list import MultipleObjectMixin, MultipleObjectTemplateResponseMixin
 from POS.forms import SaleForm, HoldOrderForm, AddCustomerForm, PaymentForm, AddStoreForm, AddProductForm, \
-    StoreProductForm, CashInHandForm
-from POS.models import Sale, Hold, Customer, Payment, Register
+    StoreProductForm, CashInHandForm, SaleReportFilterForm, PaymentReportFilterForm, RegistersReportFilterForm, \
+    ProductsReportFilterForm
+from POS.models import Sale, Hold, Customer, Payment, Register, SaleItem
 from POS.models import Store, StoreProduct
-from inventory.models import Product
+from inventory.models import Product, PurchaseOrder, Expense
 from user_accounts.models import User
 
 
@@ -244,6 +247,7 @@ class ProductListView(ListView):
 class StoreWiseProductListView(MultipleObjectTemplateResponseMixin, MultipleObjectMixin, View):
     model = StoreProduct
     template_name = 'POS/list_products.html'
+    paginate_by = 5
 
     def get(self, request, pk):
         stores = Store.objects.all()
@@ -428,3 +432,326 @@ class CloseRegisterView(View):
         register.status = 'C'
         register.save()
         return redirect('stores')
+
+
+class DashboardView(TemplateView):
+    template_name = 'dashboard.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        sale = Sale.objects.filter(created_at__month=datetime.datetime.now().month)
+        context['sales'] = sale
+        tax = sale.aggregate(Sum('order_tax'))['order_tax__sum']
+        context['tax'] = tax
+        discount = sale.aggregate(Sum('discount'))['discount__sum']
+        context['discount'] = discount
+        month = datetime.datetime.now().month
+        current_month_name = calendar.month_name[month]
+        current_year_name = datetime.datetime.now().year
+        display = f'{current_month_name} - {current_year_name}'
+        context['month'] = {'display': display}
+        products = SaleItem.objects.filter(created_at__month=datetime.datetime.now().month).values(
+            'product__name').annotate(total_quantity=Sum('quantity')).order_by('-total_quantity')[:5]
+        context['products'] = products
+        return context
+
+
+class DailyReportView(TemplateView):
+    template_name = 'POS/daily_report.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        sales_value = Sale.objects.filter(status='P', created_at__day=datetime.datetime.today().day).aggregate(
+            sales_value=Sum('total_payable'))['sales_value']
+        if not sales_value:
+            sales_value = 0
+        sale_count = Sale.objects.filter(status='P', created_at__day=datetime.datetime.today().day).count()
+        context['sales_value'] = sales_value
+        context['sale_count'] = sale_count
+        purchase_value = PurchaseOrder.objects.filter(modified_on__day=datetime.datetime.today().day).aggregate(
+            purchase_value=Sum('total'))['purchase_value']
+        if not purchase_value:
+            purchase_value = 0
+        purchase_count = PurchaseOrder.objects.filter(modified_on__day=datetime.datetime.today().day).count()
+        context['purchase_value'] = purchase_value
+        context['purchase_count'] = purchase_count
+        expense_value = \
+            Expense.objects.filter(date__day=datetime.datetime.today().day).aggregate(expense_value=Sum('amount'))[
+                'expense_value']
+        if not expense_value:
+            expense_value = 0
+        expense_count = Expense.objects.filter(date__day=datetime.datetime.today().day).count()
+        context['expense_value'] = expense_value
+        context['expense_count'] = expense_count
+        today_cost = \
+            SaleItem.objects.filter(updated_at__day=datetime.datetime.today().day).values('product__cost').aggregate(
+                Sum('product__cost'))['product__cost__sum']
+        if not today_cost:
+            today_cost = 0
+        profit = sales_value - (today_cost + purchase_value + expense_value)
+        context['profit'] = profit
+        return context
+
+
+class MonthlyReportView(TemplateView):
+    template_name = 'POS/monthly_report.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        sales_value = Sale.objects.filter(status='P', created_at__month=datetime.datetime.today().month).aggregate(
+            sales_value=Sum('total_payable'))['sales_value']
+        if not sales_value:
+            sales_value = 0
+        sale_count = Sale.objects.filter(status='P', created_at__month=datetime.datetime.today().month).count()
+        context['sales_value'] = sales_value
+        context['sale_count'] = sale_count
+        purchase_value = PurchaseOrder.objects.filter(modified_on__month=datetime.datetime.today().month).aggregate(
+            purchase_value=Sum('total'))['purchase_value']
+        if not purchase_value:
+            purchase_value = 0
+        purchase_count = PurchaseOrder.objects.filter(modified_on__month=datetime.datetime.today().month).count()
+        context['purchase_value'] = purchase_value
+        context['purchase_count'] = purchase_count
+        expense_value = \
+            Expense.objects.filter(date__month=datetime.datetime.today().month).aggregate(expense_value=Sum('amount'))[
+                'expense_value']
+        if not expense_value:
+            expense_value = 0
+        expense_count = Expense.objects.filter(date__month=datetime.datetime.today().month).count()
+        context['expense_value'] = expense_value
+        context['expense_count'] = expense_count
+        today_cost = SaleItem.objects.filter(updated_at__month=datetime.datetime.today().month).values(
+            'product__cost').aggregate(Sum('product__cost'))['product__cost__sum']
+        if not today_cost:
+            today_cost = 0
+        profit = sales_value - (today_cost + purchase_value + expense_value)
+        context['profit'] = profit
+        return context
+
+
+class SalesReportView(ListView):
+    model = Sale
+    template_name = 'POS/sales_report.html'
+    context_object_name = 'sales'
+    paginate_by = 5
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data()
+        context['filter_form'] = SaleReportFilterForm(self.request.POST)
+        return context
+
+
+class FilterSalesReportView(MultipleObjectTemplateResponseMixin, MultipleObjectMixin, View):
+    model = Sale
+    template_name = 'POS/sales_report.html'
+    paginate_by = 5
+    context_object_name = 'sales'
+
+    def post(self, request):
+        customer_id = request.POST.get('customer')
+        sales = Sale.objects.all()
+        user_id = request.POST.get('user')
+        start_date = request.POST.get('start_date')
+        end_date = request.POST.get('end_date')
+        if customer_id:
+            customer = Customer.objects.get(id=customer_id)
+            sales = Sale.objects.filter(customer=customer)
+        elif user_id:
+            user = User.objects.get(id=user_id)
+            sales = Sale.objects.filter(user=user)
+        elif start_date:
+            sales = Sale.objects.filter(created_at__gte=start_date)
+        elif end_date:
+            sales = Sale.objects.filter(created_at__lte=end_date)
+        else:
+            sales = sales
+        return render(request, 'POS/sales_report.html',
+                      context={'sales': sales, 'filter_form': SaleReportFilterForm(request.POST or None)})
+
+
+class PaymentReportView(ListView):
+    model = Payment
+    template_name = 'POS/payment_report.html'
+    context_object_name = 'payments'
+    paginate_by = 5
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data()
+        context['filter_form'] = PaymentReportFilterForm(self.request.POST)
+        return context
+
+
+class FilterPaymentsReportView(MultipleObjectTemplateResponseMixin, MultipleObjectMixin, View):
+    model = Payment
+    template_name = 'POS/payment_report.html'
+    paginate_by = 5
+    context_object_name = 'payments'
+
+    def post(self, request):
+        payment_reference = request.POST.get('payment_reference')
+        sale_no = request.POST.get('sale_no')
+        created_by_id = request.POST.get('created_by')
+        paid_by = request.POST.get('paid_by')
+        customer_id = request.POST.get('customer')
+        payments = Payment.objects.all()
+        start_date = request.POST.get('start_date')
+        end_date = request.POST.get('end_date')
+        if customer_id:
+            customer = Customer.objects.get(id=customer_id)
+            payments = Payment.objects.filter(sale__customer_id=customer)
+        elif created_by_id:
+            user = User.objects.get(id=created_by_id)
+            payments = Payment.objects.filter(sale__user=user)
+        elif paid_by:
+            payments = Payment.objects.filter(payment_by=paid_by)
+        elif payment_reference:
+            payments = Payment.objects.filter(payment_note=payment_reference)
+        elif sale_no:
+            payments = Payment.objects.filter(sale_id=sale_no)
+        elif start_date:
+            payments = Payment.objects.filter(created_at__gte=start_date)
+        elif end_date:
+            payments = Payment.objects.filter(created_at__lte=end_date)
+        else:
+            payments = payments
+        return render(request, 'POS/payment_report.html',
+                      context={'payments': payments, 'filter_form': PaymentReportFilterForm(request.POST or None)})
+
+
+class RegisterReportView(ListView):
+    model = Register
+    template_name = 'POS/registers_report.html'
+    context_object_name = 'registers'
+    paginate_by = 5
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data()
+        context['filter_form'] = RegistersReportFilterForm(self.request.POST)
+        return context
+
+
+class FilterRegistersReportView(MultipleObjectTemplateResponseMixin, MultipleObjectMixin, View):
+    model = Register
+    template_name = 'POS/registers_report.html'
+    paginate_by = 5
+    context_object_name = 'registers'
+
+    def post(self, request):
+        user_id = request.POST.get('user')
+        start_date = request.POST.get('start_date')
+        end_date = request.POST.get('end_date')
+        registers = Register.objects.all()
+        if user_id:
+            user = User.objects.get(id=user_id)
+            registers = Register.objects.filter(user=user)
+        elif start_date:
+            registers = Register.objects.filter(updated_on__gte=start_date)
+        elif end_date:
+            registers = Register.objects.filter(updated_on__lte=end_date)
+        else:
+            registers = registers
+        return render(request, 'POS/registers_report.html',
+                      context={'registers': registers, 'filter_form': RegistersReportFilterForm(request.POST or None)})
+
+
+class TopProductsView(TemplateView):
+    template_name = 'POS/top_products.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        current_date = datetime.datetime.now()
+        first_day_of_current_month = current_date.replace(day=1)
+        last_day_of_previous_month = first_day_of_current_month - datetime.timedelta(days=1)
+        first_day_of_previous_month = last_day_of_previous_month.replace(day=1)
+        third_month_ago = last_day_of_previous_month - datetime.timedelta(days=1)
+        second_month_ago = third_month_ago.replace(day=1)
+        first_month_ago = second_month_ago - datetime.timedelta(days=1)
+        twelfth_month_ago = first_day_of_current_month - datetime.timedelta(days=365)
+        first_day_of_twelfth_month_ago = twelfth_month_ago.replace(day=1)
+        year_12_months_ago = twelfth_month_ago.year
+        month_12_months_ago = calendar.month_name[twelfth_month_ago.month]
+        current_month_products = SaleItem.objects.filter(created_at__month=datetime.datetime.now().month).values(
+            'product__name').annotate(quantity=Sum('quantity')).order_by('-quantity')
+        last_month_products = SaleItem.objects.filter(created_at__gte=first_day_of_previous_month,
+                                                      created_at__lte=last_day_of_previous_month).values(
+            'product__name').annotate(quantity=Sum('quantity')).order_by('-quantity')
+        previous_three_months_products = SaleItem.objects.filter(created_at__gte=first_month_ago,
+                                                                 created_at__lte=last_day_of_previous_month).values(
+            'product__name').annotate(quantity=Sum('quantity')).order_by('-quantity')
+        last_twelve_months_products = SaleItem.objects.filter(created_at__gte=first_day_of_twelfth_month_ago,
+                                                              created_at__lte=last_day_of_previous_month).values(
+            'product__name').annotate(quantity=Sum('quantity')).order_by('-quantity')
+        context['current_month_products'] = current_month_products
+        context['last_month_products'] = last_month_products
+        context['previous_three_months_products'] = previous_three_months_products
+        context['last_twelve_months_products'] = last_twelve_months_products
+        current_month = calendar.month_name[datetime.datetime.now().month]
+        last_month = calendar.month_name[first_day_of_previous_month.month]
+        last_three_month = calendar.month_name[first_month_ago.month]
+        current_year = datetime.datetime.now().year
+        context['current_month'] = current_month
+        context['last_month'] = last_month
+        context['last_three_month'] = last_three_month
+        context['current_year'] = current_year
+        context['year_12_months_ago'] = year_12_months_ago
+        context['month_12_months_ago'] = month_12_months_ago
+
+        return context
+
+
+class TopProductsReportView(ListView):
+    model = SaleItem
+    template_name = 'POS/top_products_report.html'
+    context_object_name = 'sales'
+    queryset = SaleItem.objects.filter(sale__status='P').values('product__code', 'product__name').annotate(
+        sold=Sum('quantity'), tax=Sum('product__product_tax'), cost=Sum('product__cost') * Sum('quantity'),
+        income=Sum('price') * Sum('quantity'),
+        profit=(Sum('price') * Sum('quantity')) - (Sum('product__cost')) * Sum('quantity'))
+    paginate_by = 5
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data()
+        context['filter_form'] = ProductsReportFilterForm(self.request.POST)
+        return context
+
+
+class FilterProductsReportView(MultipleObjectTemplateResponseMixin, MultipleObjectMixin, View):
+    model = SaleItem
+    template_name = 'POS/top_products_report.html'
+    paginate_by = 5
+    context_object_name = 'sales'
+
+    def post(self, request):
+        product_id = request.POST.get('products')
+        start_date = request.POST.get('start_date')
+        end_date = request.POST.get('end_date')
+        sales = SaleItem.objects.filter(sale__status='P').values('product__code', 'product__name').annotate(
+            sold=Sum('quantity'), tax=Sum('product__product_tax'), cost=Sum('product__cost') * Sum('quantity'),
+            income=Sum('price') * Sum('quantity'),
+            profit=(Sum('price') * Sum('quantity')) - (Sum('product__cost')) * Sum('quantity'))
+        if product_id:
+            product = Product.objects.get(id=product_id)
+            sales = SaleItem.objects.filter(sale__status='P', product=product).values('product__code',
+                                                                                      'product__name').annotate(
+                sold=Sum('quantity'), tax=Sum('product__product_tax'), cost=Sum('product__cost') * Sum('quantity'),
+                income=Sum('price') * Sum('quantity'),
+                profit=(Sum('price') * Sum('quantity')) - (Sum('product__cost')) * Sum('quantity'))
+        elif start_date:
+            sales = SaleItem.objects.filter(sale__status='P', updated_at__gte=start_date).values('product__code',
+                                                                                                 'product__name').annotate(
+                sold=Sum('quantity'), tax=Sum('product__product_tax'), cost=Sum('product__cost') * Sum('quantity'),
+                income=Sum('price') * Sum('quantity'),
+                profit=(Sum('price') * Sum('quantity')) - (Sum('product__cost')) * Sum('quantity'))
+        elif end_date:
+            sales = SaleItem.objects.filter(sale__status='P', updated_at__lte=end_date).values('product__code',
+                                                                                               'product__name').annotate(
+                sold=Sum('quantity'), tax=Sum('product__product_tax'), cost=Sum('product__cost') * Sum('quantity'),
+                income=Sum('price') * Sum('quantity'),
+                profit=(Sum('price') * Sum('quantity')) - (Sum('product__cost')) * Sum('quantity'))
+        else:
+            sales = sales
+        return render(request, 'POS/top_products_report.html',
+                      context={'sales': sales, 'filter_form': ProductsReportFilterForm(request.POST or None)})

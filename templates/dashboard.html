@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+{% block title %}
+    Dashboard
+{% endblock %}
+{% block charts %}
+    <script>
+        google.charts.load('current', {packages: ['corechart']});
+        google.charts.setOnLoadCallback(drawChart);
+
+        function drawChart() {
+            var salesCount = {{ sales.count }};
+            var discount = {{ discount }};
+            var tax = {{ tax }};
+            var month = '{{ month.display }}';
+            var data = google.visualization.arrayToDataTable([
+                ['Month', 'Sales', 'Discount', 'Tax', {role: 'annotation'}],
+                [month, salesCount, discount, tax, ''],
+            ]);
+
+            var options = {
+                title: 'Monthly Sales Overview',
+                height: 300,
+                legend: {position: 'top', maxLines: 3},
+                bar: {groupWidth: '50%'},
+                isStacked: true,
+            };
+
+            // Instantiate and draw the chart.
+            var chart = new google.visualization.ColumnChart(document.getElementById('myStackedChart'));
+            chart.draw(data, options);
+        }
+    </script>
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+
+        var data = google.visualization.arrayToDataTable([
+          ['Product Name', 'Total Sold'],
+            {% for product in products %}
+            ['{{ product.product__name }}', {{ product.total_quantity }}],
+          {% endfor %}
+        ]);
+
+        var options = {
+          title: 'Top Products this month'
+        };
+
+        var chart = new google.visualization.PieChart(document.getElementById('myPieChart'));
+
+        chart.draw(data, options);
+      }
+    </script>
+{% endblock %}
+{% block content %}
+    <div class="right_col" role="main">
+        <div class="">
+            <div class="page-title">
+                <div class="title_left">
+                    <h3>Dashboard</h3>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+            <div class="row">
+                <div class="col-md-12 col-sm-12 ">
+                    <div class="x_panel">
+                        <div class="x_title">
+                            <h2>Quick Links</h2>
+                            <ul class="nav navbar-right panel_toolbox">
+                                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                </li>
+                            </ul>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content">
+                            <br/>
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="box box-success">
+                                        <div class="box-body mt-2">
+                                            {% if reg %}
+                                                <a class="btn btn-app" href="{% url 'create-sale' reg.id %}">
+                                                    <i class="fa fa-th"></i> POS </a>
+                                            {% endif %}
+                                            <a class="btn btn-app" href="{% url 'list-products' %}">
+                                                <i class="fa fa-barcode"></i> Products </a>
+                                            <a class="btn btn-app" href="{% url 'list-sales' %}">
+                                                <i class="fa fa-shopping-cart"></i> Sales </a>
+                                            <a class="btn btn-app" href="{% url 'list-opened-bills' %}">
+
+                                                <i class="fa fa-bell-o"></i> Opened Bills </a>
+                                            <a class="btn btn-app" href="{% url 'list-categories' %}">
+                                                <i class="fa fa-folder-open"></i> Categories </a>
+                                            <a class="btn btn-app" href="{% url 'list-customers' %}">
+                                                <i class="fa fa-users"></i> Customers </a>
+                                            <a class="btn btn-app" href="#">
+                                                <i class="fa fa-cogs"></i> Settings </a>
+                                            <a class="btn btn-app" href="#">
+                                                <i class="fa fa-bar-chart-o"></i> Reports </a>
+                                            <a class="btn btn-app" href="{% url 'list-users' %}">
+                                                <i class="fa fa-users"></i> Users </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="x_content">
+                            <br/>
+                            <div class="row">
+                                <div class="col-md-6 col-sm-6  ">
+                                    <div class="x_panel">
+                                        <div class="x_title">
+                                            Sales
+                                        </div>
+                                        <div class="x_content">
+                                            <div id="myStackedChart"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-sm-6  ">
+                                    <div class="x_panel">
+                                        <div class="x_title">
+                                            Top Products ({{ month.display }})
+                                        </div>
+                                        <div class="x_content">
+                                            <div id="myPieChart" style="height: 300px"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

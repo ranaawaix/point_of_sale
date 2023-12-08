@@ -50,6 +50,7 @@
                                                cellspacing="0" width="100%">
                                             <thead>
                                             <tr>
+                                                <th>Image</th>
                                                 <th>First name</th>
                                                 <th>Last name</th>
                                                 <th>Email</th>
@@ -62,6 +63,11 @@
                                             <tbody>
                                             {% for user in users %}
                                                 <tr>
+                                                {% if user.avatar %}
+                                                <td class="text-center"><img src="{{ user.avatar.url }}" alt="" style="max-width: 50px"></td>
+                                                    {% else %}
+                                                    <td class="text-center">N/A</td>
+                                                {% endif %}
                                                     <td>{{ user.first_name }}</td>
                                                     <td>{{ user.last_name }}</td>
                                                     <td>{{ user.email }}</td>

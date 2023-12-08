@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block title %}
-    List Products
+    Products Report
 {% endblock %}
 {% block content %}
     <!-- page content -->
@@ -9,7 +9,7 @@
         <div class="">
             <div class="page-title">
                 <div class="title_left">
-                    <h3>All Products <small>List of all the Products Store Wise</small></h3>
+                    <h3>Products Report</h3>
                 </div>
             </div>
 
@@ -18,25 +18,47 @@
                 <div class="x_content">
                     <div class="row">
                         <div class="col-sm-12">
-                                        <span class=" float-left text-muted font-13 mb-3">
+                            <div class="box-header">
+                                <span class=" float-left text-muted font-13 mb-3">
                                             List of all the Products Available
                                         </span>
-                                <div role="presentation" class="dropdown float-right mr-5">
-                                    <a id="drop4" href="#" class="dropdown-toggle" data-toggle="dropdown"
-                                       aria-haspopup="true" role="button" aria-expanded="false">
-                                        Select Store
-                                        <span class="caret"></span>
-                                    </a>
-                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                        {% for store in stores %}
-                                            <a class="dropdown-item"
-                                               href="{% url 'list-products-by-store' store.id %}">{{ store.name }}</a>
-                                        {% endfor %}
+                                <div class="col-md-12 col-sm-12 float-right">
+                                    <div class="x_panel">
+                                        <div class="x_title">
+                                            <h2>Filter Form</h2>
+                                            <ul class="nav navbar-right panel_toolbox">
+                                                <li>
+                                                    <a class="collapse-link" data-toggle="collapse" href="#filterForm">
+                                                        <i class="fa fa-chevron-up"></i>
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                            <div class="clearfix"></div>
+                                        </div>
+                                        <div id="filterForm" class="collapse show">
+                                            <!-- 'show' class to keep it open by default -->
+                                            <div class="x_content">
+                                                <br>
+                                                <form class="form-horizontal form-label-left" method="post" action="{% url 'top-products-filter' %}" novalidate>
+                                                {% csrf_token %}
+                                                    {% for field in filter_form %}
+                                                        <div class="form-group row">
+                                                            <label class="control-label col-md-3 col-sm-3 col-xs-3">{{ field.label_tag }}</label>
+                                                            <div class="col-md-9 col-sm-9 col-xs-9">
+                                                                {{ field }}
+                                                            </div>
+                                                        </div>
+                                                    {% endfor %}
+                                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                                </form>
+                                            </div>
+                                        </div>
                                     </div>
+
                                 </div>
+                            </div>
                         </div>
                     </div>
-                    <br>
                     <div class="row">
                         <div class="col-sm-12">
                             <div class="card-box table-responsive">
@@ -55,37 +77,19 @@
                                                         aria-controls="datatable-responsive" rowspan="1"
                                                         colspan="1" style="width: 81.2px;" aria-sort="ascending"
                                                         aria-label="First name: activate to sort column descending">
-                                                        Image
+                                                        Code
                                                     </th>
                                                     <th class="sorting text-center" tabindex="0"
                                                         aria-controls="datatable-responsive" rowspan="1"
                                                         colspan="1" style="width: 80.2px;"
                                                         aria-label="Last name: activate to sort column ascending">
-                                                        Code
-                                                    </th>
-                                                    <th class="sorting text-center" tabindex="0"
-                                                        aria-controls="datatable-responsive" rowspan="1"
-                                                        colspan="1" style="width: 81.2px;"
-                                                        aria-label="Office: activate to sort column ascending">
                                                         Name
                                                     </th>
                                                     <th class="sorting text-center" tabindex="0"
                                                         aria-controls="datatable-responsive" rowspan="1"
                                                         colspan="1" style="width: 81.2px;"
                                                         aria-label="Office: activate to sort column ascending">
-                                                        Type
-                                                    </th>
-                                                    <th class="sorting text-center" tabindex="0"
-                                                        aria-controls="datatable-responsive" rowspan="1"
-                                                        colspan="1" style="width: 81.2px;"
-                                                        aria-label="Office: activate to sort column ascending">
-                                                        Category
-                                                    </th>
-                                                    <th class="sorting text-center" tabindex="0"
-                                                        aria-controls="datatable-responsive" rowspan="1"
-                                                        colspan="1" style="width: 81.2px;"
-                                                        aria-label="Office: activate to sort column ascending">
-                                                        Quantity
+                                                        Sold
                                                     </th>
                                                     <th class="sorting text-center" tabindex="0"
                                                         aria-controls="datatable-responsive" rowspan="1"
@@ -97,69 +101,32 @@
                                                         aria-controls="datatable-responsive" rowspan="1"
                                                         colspan="1" style="width: 81.2px;"
                                                         aria-label="Office: activate to sort column ascending">
-                                                        Method
-                                                    </th>
-                                                    <th class="sorting text-center" tabindex="0"
-                                                        aria-controls="datatable-responsive" rowspan="1"
-                                                        colspan="1" style="width: 81.2px;"
-                                                        aria-label="Office: activate to sort column ascending">
                                                         Cost
                                                     </th>
                                                     <th class="sorting text-center" tabindex="0"
                                                         aria-controls="datatable-responsive" rowspan="1"
                                                         colspan="1" style="width: 81.2px;"
                                                         aria-label="Office: activate to sort column ascending">
-                                                        Price
+                                                        Income
                                                     </th>
                                                     <th class="sorting text-center" tabindex="0"
                                                         aria-controls="datatable-responsive" rowspan="1"
                                                         colspan="1" style="width: 81.2px;"
                                                         aria-label="Office: activate to sort column ascending">
-                                                        Actions
+                                                        Profit
                                                     </th>
                                                 </tr>
                                                 </thead>
                                                 <tbody>
-                                                {% for storeproduct in storeproducts %}
+                                                {% for sale in sales %}
                                                     <tr role="row" class="odd">
-                                                        {% if storeproduct.product.image.url %}
-                                                            <td class="text-center"><img
-                                                                    src="{{ storeproduct.product.image.url }}" alt=""
-                                                                    style="max-width: 50px"></td>
-                                                        {% else %}
-                                                            <td class="text-center"><img
-                                                                    src="{% static 'images/img.jpg' %}"
-                                                                    alt="" style="max-width: 50px">
-                                                            </td>
-                                                        {% endif %}
-                                                        <td class="text-center">{{ storeproduct.product.code }}</td>
-                                                        <td class="text-center">{{ storeproduct.product.name }}</td>
-                                                        <td class="text-center">{{ storeproduct.product.type }}</td>
-                                                        <td class="text-center">{{ storeproduct.product.category }}</td>
-                                                        <td class="text-center">{{ storeproduct.product.quantity }}</td>
-                                                        <td class="text-center">{{ storeproduct.product.product_tax }}</td>
-                                                        <td class="text-center">{{ storeproduct.product.tax_method }}</td>
-                                                        <td class="text-center">{{ storeproduct.product.cost }}</td>
-                                                        <td class="text-center">{{ storeproduct.product.price }}</td>
-                                                        <td class="text-center" style="padding:6px;">
-                                                            <div class="btn-group btn-group-justified"
-                                                                 role="group">
-                                                                <div class="btn-group btn-group-xs"
-                                                                     role="group">
-                                                                    <a class="tip btn btn-warning btn-xs"
-                                                                       title="Edit Category"
-                                                                       href="{% url 'update-product' storeproduct.product.id %}"><i
-                                                                            class="fa fa-edit"></i></a>
-                                                                </div>
-                                                                <div class="btn-group btn-group-xs"
-                                                                     role="group">
-                                                                    <a class="tip btn btn-danger btn-xs"
-                                                                       title="Delete Category"
-                                                                       href="{% url 'delete-product' storeproduct.product.id %}"><i
-                                                                            class="fa fa-trash-o"></i></a>
-                                                                </div>
-                                                            </div>
-                                                        </td>
+                                                        <td class="text-center">{{ sale.product__code }}</td>
+                                                        <td class="text-center">{{ sale.product__name }}</td>
+                                                        <td class="text-center">{{ sale.sold }}</td>
+                                                        <td class="text-center">{{ sale.tax }}</td>
+                                                        <td class="text-center">{{ sale.cost }}</td>
+                                                        <td class="text-center">{{ sale.income }}</td>
+                                                        <td class="text-center">{{ sale.profit }}</td>
                                                     </tr>
                                                 {% endfor %}
                                                 </tbody>

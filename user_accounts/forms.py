@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 from django.core.exceptions import ValidationError
 from user_accounts.models import User
+from django.contrib.auth.forms import PasswordChangeForm
 
 
 class CreateUserForm(forms.ModelForm):
@@ -19,7 +20,7 @@ class CreateUserForm(forms.ModelForm):
                    'gender': forms.Select(attrs={'class': 'form-control', 'empty_label': '---Please Select---'}),
                    'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Enter Email...'}),
                    'username': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter Username...'}),
-                   'status': forms.Select(attrs={'class': 'form-control', 'empty_label': '---Please Select---'}), }
+                   'status': forms.Select(attrs={'class': 'form-control', 'empty_label': '---Please Select---'}),}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -71,3 +72,22 @@ class UserUpdateForm(forms.ModelForm):
             'status': forms.Select(attrs={'class': 'form-control', 'empty_label': '---Please Select---'}),
             'store': forms.Select(attrs={'class': 'form-control', 'empty_label': '---Please Select---'}),
         }
+
+
+class AvatarForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['avatar']
+        widgets = {
+            'avatar': forms.ClearableFileInput(attrs={'class': 'form-control'})
+        }
+
+
+class ChangePasswordForm(PasswordChangeForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.base_fields['old_password'].widget.attrs['class'] = 'form-control'
+        self.base_fields['new_password1'].widget.attrs['class'] = 'form-control'
+        self.base_fields['new_password2'].widget.attrs['class'] = 'form-control'
+

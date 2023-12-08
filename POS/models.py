@@ -1,10 +1,7 @@
-import datetime
-
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import Sum
 from django.shortcuts import get_object_or_404
-
 from inventory.models import Product
 from user_accounts.models import User
 
@@ -137,39 +134,6 @@ class Sale(models.Model):
         return sale
 
 
-REGISTER_STATUS_CHOICES = [
-    ('O', 'Open'),
-    ('C', 'Close'),
-]
-
-
-class Register(models.Model):
-    store = models.ForeignKey(Store, on_delete=models.CASCADE, related_name='pos')
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='pos')
-    opening_cash_in_hand = models.IntegerField(null=True, blank=True)
-    closing_cash_in_hand = models.IntegerField(null=True, blank=True)
-    status = models.CharField(choices=REGISTER_STATUS_CHOICES ,max_length=10)
-    created_on = models.DateTimeField(auto_now_add=True)
-    updated_on = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return f'{self.id} - {self.store} - {self.user}'
-
-
-class SaleItem(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='saleitems')
-    sale = models.ForeignKey(Sale, on_delete=models.CASCADE, related_name='saleitems')
-    register = models.ForeignKey(Register, on_delete=models.CASCADE, related_name='saleitems')
-    price = models.IntegerField()
-    quantity = models.IntegerField(default=0)
-    total = models.IntegerField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.product.name
-
-
 PAYMENT_CHOICES = [
     ('Ca', 'Cash'),
     ('Ch', 'Cheque'),
@@ -189,6 +153,39 @@ class Payment(models.Model):
 
     def __str__(self):
         return str(self.amount)
+
+
+REGISTER_STATUS_CHOICES = [
+    ('O', 'Open'),
+    ('C', 'Close'),
+]
+
+
+class Register(models.Model):
+    store = models.ForeignKey(Store, on_delete=models.CASCADE, related_name='pos')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='pos')
+    opening_cash_in_hand = models.IntegerField(null=True, blank=True)
+    closing_cash_in_hand = models.IntegerField(null=True, blank=True)
+    status = models.CharField(choices=REGISTER_STATUS_CHOICES, max_length=10)
+    created_on = models.DateTimeField(auto_now_add=True)
+    updated_on = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f'{self.id} - {self.store} - {self.user}'
+
+
+class SaleItem(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='saleitems')
+    sale = models.ForeignKey(Sale, on_delete=models.CASCADE, related_name='saleitems')
+    register = models.ForeignKey(Register, on_delete=models.CASCADE, related_name='saleitems')
+    price = models.IntegerField()
+    quantity = models.IntegerField(default=0)
+    total = models.IntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.product.name
 
 
 class Hold(models.Model):

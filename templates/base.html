@@ -14,6 +14,7 @@
     {% endblock %}</title>
 
     <!-- Bootstrap -->
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
     <link href="{% static 'vendors/bootstrap/dist/css/bootstrap.min.css' %}" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
@@ -33,6 +34,8 @@
 
     <!-- Custom Theme Style -->
     <link href="{% static 'build/css/custom.min.css' %}" rel="stylesheet">
+    {% block charts %}
+    {% endblock %}
     {% block links %}{% endblock %}
 </head>
 <body class="nav-md">
@@ -49,7 +52,11 @@
                 <!-- menu profile quick info -->
                 <div class="profile clearfix">
                     <div class="profile_pic">
-                        <img src="{% static 'images/img.jpg' %}" alt="..." class="img-circle profile_img">
+                        {% if user.avatar %}
+                            <img src="{{ user.avatar.url }}" alt="..." class="img-circle profile_img">
+                        {% else %}
+                            <img src="{% static 'images/img.jpg' %}" alt="..." class="img-circle profile_img">
+                        {% endif %}
                     </div>
                     <div class="profile_info">
                         <span>Welcome,</span>
@@ -65,10 +72,12 @@
                     <div class="menu_section">
                         <h3>General</h3>
                         <ul class="nav side-menu">
-                            <li><a href=""><i class="fa fa-home"></i> Dashboard </a>
+                            <li><a href="{% url 'dashboard' %}"><i class="fa fa-home"></i> Dashboard </a>
                             </li>
-                            <li><a href="{% url 'stores' %}"><i class="fa fa-tablet"></i> Stores </a>
-                            </li>
+                            {% if not reg %}
+                                <li><a href="{% url 'stores' %}"><i class="fa fa-tablet"></i> Stores </a>
+                                </li>
+                            {% endif %}
                             {% if reg %}
                                 <li><a href="{% url 'create-sale' reg.id %}"><i class="fa fa-th"></i> POS </a>
                                 </li>
@@ -97,54 +106,73 @@
                                     <li><a href="{% url 'list-opened-bills' %}">List Opened Bills</a></li>
                                 </ul>
                             </li>
-                            <li><a><i class="fa fa-plus"></i> Purchases <span class="fa fa-chevron-down"></span></a>
-                                <ul class="nav child_menu">
-                                    <li><a href="{% url 'list-purchase-orders' %}">List Purchases</a></li>
-                                    <li><a href="{% url 'add-purchase-order' %}">Add Purchase</a></li>
-                                    <hr>
-                                    <li><a href="{% url 'list-expenses' %}">List Expenses</a></li>
-                                    <li><a href="{% url 'add-expense' %}">Add Expense</a></li>
-                                </ul>
-                            </li>
-                            <li><a><i class="fa fa-users"></i> People <span class="fa fa-chevron-down"></span></a>
-                                <ul class="nav child_menu">
-                                    <li><a href="{% url 'list-users' %}">List Users</a></li>
-                                    <li><a href="{% url 'add-user' %}">Add User</a></li>
-                                    <hr>
-                                    <li><a href="{% url 'list-customers' %}">List Customers</a></li>
-                                    <li><a href="{% url 'add-customer' %}">Add Customer</a></li>
-                                    <hr>
-                                    <li><a href="{% url 'list-suppliers' %}">List Suppliers</a></li>
-                                    <li><a href="{% url 'add-supplier' %}">Add Supplier</a></li>
-                                </ul>
-                            </li>
-                            <li><a><i class="fa fa-cogs"></i> Settings <span class="fa fa-chevron-down"></span></a>
-                                <ul class="nav child_menu">
-                                    <li><a href="#">Settings</a></li>
-                                    <hr>
-                                    <li><a href="{% url 'stores' %}">Stores</a></li>
-                                    <li><a href="{% url 'create-store' %}">Add Store</a></li>
-                                    <hr>
-                                    <li><a href="#">Printers</a></li>
-                                    <li><a href="#">Add Printer</a></li>
-                                    <hr>
-                                    <li><a href="#">Backups</a></li>
-                                </ul>
-                            </li>
-                            <li><a><i class="fa fa-bar-chart-o"></i>Reports <span class="fa fa-chevron-down"></span></a>
-                                <ul class="nav child_menu">
-                                    <li><a href="#">Daily Sales</a></li>
-                                    <li><a href="#">Monthly Sales</a></li>
-                                    <li><a href="#">Sales Report</a></li>
-                                    <hr>
-                                    <li><a href="#">Payment Report</a></li>
-                                    <hr>
-                                    <li><a href="#">Registers Report</a></li>
-                                    <hr>
-                                    <li><a href="#">Top Products</a></li>
-                                    <li><a href="#">Products Report</a></li>
-                                </ul>
-                            </li>
+                            {% if user.group == 'A' %}
+                                <li><a><i class="fa fa-plus"></i> Purchases <span class="fa fa-chevron-down"></span></a>
+                                    <ul class="nav child_menu">
+                                        <li><a href="{% url 'list-purchase-orders' %}">List Purchases</a></li>
+                                        <li><a href="{% url 'add-purchase-order' %}">Add Purchase</a></li>
+                                        <hr>
+                                        <li><a href="{% url 'list-expenses' %}">List Expenses</a></li>
+                                        <li><a href="{% url 'add-expense' %}">Add Expense</a></li>
+                                    </ul>
+                                </li>
+                            {% else %}
+                                <li><a><i class="fa fa-plus"></i> Expenses <span class="fa fa-chevron-down"></span></a>
+                                    <ul class="nav child_menu">
+                                        <li><a href="{% url 'list-expenses' %}">List Expenses</a></li>
+                                        <li><a href="{% url 'add-expense' %}">Add Expense</a></li>
+                                    </ul>
+                                </li>
+                            {% endif %}
+                            {% if user.group == 'A' %}
+                                <li><a><i class="fa fa-users"></i> People <span class="fa fa-chevron-down"></span></a>
+                                    <ul class="nav child_menu">
+                                        <li><a href="{% url 'list-users' %}">List Users</a></li>
+                                        <li><a href="{% url 'add-user' %}">Add User</a></li>
+                                        <hr>
+                                        <li><a href="{% url 'list-customers' %}">List Customers</a></li>
+                                        <li><a href="{% url 'add-customer' %}">Add Customer</a></li>
+                                        <hr>
+                                        <li><a href="{% url 'list-suppliers' %}">List Suppliers</a></li>
+                                        <li><a href="{% url 'add-supplier' %}">Add Supplier</a></li>
+                                    </ul>
+                                </li>
+                                <li><a><i class="fa fa-cogs"></i> Settings <span class="fa fa-chevron-down"></span></a>
+                                    <ul class="nav child_menu">
+                                        <li><a href="#">Settings</a></li>
+                                        <hr>
+                                        <li><a href="{% url 'stores' %}">Stores</a></li>
+                                        <li><a href="{% url 'create-store' %}">Add Store</a></li>
+                                        <hr>
+                                        <li><a href="#">Printers</a></li>
+                                        <li><a href="#">Add Printer</a></li>
+                                        <hr>
+                                        <li><a href="#">Backups</a></li>
+                                    </ul>
+                                </li>
+                                <li><a><i class="fa fa-bar-chart-o"></i>Reports <span class="fa fa-chevron-down"></span></a>
+                                    <ul class="nav child_menu">
+                                        <li><a href="{% url 'daily_report' %}">Daily Sales</a></li>
+                                        <li><a href="{% url 'monthly_report' %}">Monthly Sales</a></li>
+                                        <li><a href="{% url 'sales_report' %}">Sales Report</a></li>
+                                        <hr>
+                                        <li><a href="{% url 'payment_report' %}">Payment Report</a></li>
+                                        <hr>
+                                        <li><a href="{% url 'register_report' %}">Registers Report</a></li>
+                                        <hr>
+                                        <li><a href="{% url 'top-products' %}">Top Products</a></li>
+                                        <li><a href="{% url 'top-products-report' %}">Products Report</a></li>
+                                    </ul>
+                                </li>
+                            {% else %}
+                                <li><a><i class="fa fa-users"></i> Customers <span
+                                        class="fa fa-chevron-down"></span></a>
+                                    <ul class="nav child_menu">
+                                        <li><a href="{% url 'list-customers' %}">List Customers</a></li>
+                                        <li><a href="{% url 'add-customer' %}">Add Customer</a></li>
+                                    </ul>
+                                </li>
+                            {% endif %}
                         </ul>
                     </div>
 
@@ -181,11 +209,15 @@
                         <li class="nav-item dropdown open" style="padding-left: 15px;">
                             <a href="javascript:" class="user-profile dropdown-toggle" aria-haspopup="true"
                                id="navbarDropdown" data-toggle="dropdown" aria-expanded="false">
-                                <img src="{% static 'images/img.jpg' %}" alt="">{{ user.username|capfirst }}
+                                {% if user.avatar %}
+                                    <img src="{{ user.avatar.url }}" alt="">{{ user.username|capfirst }}
+                                {% else %}
+                                    <img src="{% static 'images/img.jpg' %}" alt="">{{ user.username|capfirst }}
+                                {% endif %}
                             </a>
                             <div class="dropdown-menu dropdown-usermenu pull-right" aria-labelledby="navbarDropdown">
                                 <a class="dropdown-item" href="{% url 'update-user' user.id %}"> Profile</a>
-                                <a class="dropdown-item" href="#"><i class="fa fa-sign-out pull-right"></i> Log Out</a>
+                                <a class="dropdown-item" href="{% url 'logout' %}"><i class="fa fa-sign-out pull-right"></i> Log Out</a>
                             </div>
                         </li>
 
@@ -239,7 +271,8 @@
                         {% if reg %}
                             {% csrf_token %}
                             <li><a id="CloseRegister" href="#"
-                                   data-regid="{{ reg.id }}" data-url="{% url 'close_register' %}" data-rurl="{% url 'stores' %}"><i
+                                   data-regid="{{ reg.id }}" data-url="{% url 'close_register' %}"
+                                   data-rurl="{% url 'stores' %}"><i
                                     class="fa fa-close"></i> Close Register</a>
                             </li>
                         {% endif %}
@@ -391,7 +424,7 @@
             data: my_data,
             success: function (rsp) {
                 console.log(rsp)
-                rsp.success(window.location.href=rurl)
+                rsp.success(window.location.href = rurl)
             }
         })
     })

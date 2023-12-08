@@ -183,7 +183,6 @@ class DeletePurchaseOrderView(DeleteView):
     success_url = reverse_lazy('list-purchase-orders')
 
 
-
 class PurchaseOrderListView(ListView):
     model = PurchaseOrder
     template_name = 'inventory/list_purchase_orders.html'
@@ -196,6 +195,17 @@ class AddExpenseView(CreateView):
     form_class = AddExpenseForm
     template_name = 'inventory/add_expense.html'
     success_url = reverse_lazy('list-expenses')
+
+    def post(self, request, *args, **kwargs):
+        date = request.POST.get('date')
+        reference = request.POST.get('reference')
+        amount = request.POST.get('amount')
+        attachment = request.POST.get('attachment')
+        note = request.POST.get('note')
+        user = request.user
+        expense = Expense(user=user, date=date, reference=reference, amount=amount, attachment=attachment, note=note)
+        expense.save()
+        return redirect('list-expenses')
 
 
 class ListExpensesView(ListView):
@@ -240,6 +250,7 @@ class SupplierListView(ListView):
     model = Supplier
     template_name = 'inventory/list_suppliers.html'
     context_object_name = 'suppliers'
+    paginate_by = 5
 
 
 class UpdateSupplierView(UpdateView):

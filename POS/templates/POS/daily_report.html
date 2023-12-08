@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% block title %}
+    Daily Report
+{% endblock %}
+{% block content %}
+    <div class="right_col" role="main">
+        <div class="">
+            <div class="page-title">
+                <div class="title_left">
+                    <h3>Daily Sales</h3>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+            <div class="row">
+                <div class="col-md-12 col-sm-12 ">
+                    <div class="x_panel">
+                        <div class="x_title">
+                            <h2>Please review the report below</h2>
+                            <ul class="nav navbar-right panel_toolbox">
+                                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                </li>
+                            </ul>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content">
+                            <br/>
+                            <div class="row">
+                                <div class="animated flipInY col-lg-3 col-md-3 col-sm-6">
+                                    <div class="tile-stats bg-info">
+                                        <div class="icon text-white"><i class="fa fa-shopping-cart"></i>
+                                        </div>
+                                        <div class="count text-dark">{{ sales_value }}</div>
+
+                                        <h3 class="text-dark">Sales Value</h3>
+                                        <p class="text-dark"><b>{{ sale_count }} Sale(s)</b></p>
+                                    </div>
+                                </div>
+                                <div class="animated flipInY col-lg-3 col-md-3 col-sm-6  ">
+                                    <div class="tile-stats bg-warning">
+                                        <div class="icon text-white"><i class="fa fa-plus"></i>
+                                        </div>
+                                        <div class="count text-dark">{{ purchase_value }}</div>
+
+                                        <h3 class="text-dark">Purchase Value</h3>
+                                        <p class="text-dark"><b>{{ purchase_count }} Purchase(s)</b></p>
+                                    </div>
+                                </div>
+                                <div class="animated flipInY col-lg-3 col-md-3 col-sm-6  ">
+                                    <div class="tile-stats bg-danger">
+                                        <div class="icon text-white"><i class="fa fa-circle-o"></i>
+                                        </div>
+                                        <div class="count text-dark">{{ expense_value }}</div>
+
+                                        <h3 class="text-dark">Expenses Value</h3>
+                                        <p class="text-dark"><b>{{ expense_count }} Expense(s)</b></p>
+                                    </div>
+                                </div>
+                                <div class="animated flipInY col-lg-3 col-md-3 col-sm-6  ">
+                                    <div class="tile-stats bg-success">
+                                        <div class="icon text-white"><i class="fa fa-dollar"></i>
+                                        </div>
+                                        <div class="count text-dark">{{ profit }}</div>
+
+                                        <h3 class="text-dark">Profit and/or Loss</h3>
+                                        {% if profit < 0 %}
+                                        <p class="text-danger"><b>{{ profit }} Loss</b></p>
+                                            {% else %}
+                                            <p class="text-dark"><b>{{ profit }} Profit</b></p>
+                                        {% endif %}
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

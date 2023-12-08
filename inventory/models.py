@@ -1,10 +1,8 @@
 import datetime
-
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.db.models import Sum
 from django.shortcuts import get_object_or_404
-
 from user_accounts.models import User
 
 

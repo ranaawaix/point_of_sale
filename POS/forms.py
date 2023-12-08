@@ -3,6 +3,7 @@ from django.forms import inlineformset_factory
 
 from POS.models import Sale, SaleItem, Hold, Customer, Payment, Store, StoreProduct, Register
 from inventory.models import Product
+from user_accounts.models import User
 
 
 class SaleForm(forms.ModelForm):
@@ -79,17 +80,18 @@ class AddProductForm(forms.ModelForm):
                   'alert_quantity', 'image', 'details']
         exclude = ['quantity']
         widgets = {'type': forms.Select(attrs={'class': 'form-control'}),
-            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Product Name'}),
-            'code': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Product Code'}),
-            'barcode_symbology': forms.Select(attrs={'class': 'form-control'}),
-            'category': forms.Select(attrs={'class': 'form-control'}),
-            'cost': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Cost of the Product'}),
-            'price': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Price of the Product'}),
-            'product_tax': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Tax of the Product'}),
-            'tax_method': forms.Select(attrs={'class': 'form-control'}),
-            'alert_quantity': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Alert Quantity of the '
-                                                                                               'Product'}),
-            'image': forms.ClearableFileInput(attrs={'class': 'form-control'}), 'details': forms.Textarea(
+                   'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Product Name'}),
+                   'code': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Product Code'}),
+                   'barcode_symbology': forms.Select(attrs={'class': 'form-control'}),
+                   'category': forms.Select(attrs={'class': 'form-control'}),
+                   'cost': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Cost of the Product'}),
+                   'price': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Price of the Product'}),
+                   'product_tax': forms.NumberInput(
+                       attrs={'class': 'form-control', 'placeholder': 'Tax of the Product'}),
+                   'tax_method': forms.Select(attrs={'class': 'form-control'}), 'alert_quantity': forms.NumberInput(
+                attrs={'class': 'form-control', 'placeholder': 'Alert Quantity of the '
+                                                               'Product'}),
+                   'image': forms.ClearableFileInput(attrs={'class': 'form-control'}), 'details': forms.Textarea(
                 attrs={'class': 'form-control', 'placeholder': 'Any other details of the Product'}), }
 
 
@@ -117,3 +119,43 @@ class CashInHandForm(forms.ModelForm):
         fields = ['opening_cash_in_hand']
         widgets = {'opening_cash_in_hand': forms.NumberInput(
             attrs={'class': 'form-control', 'placeholder': 'Opening cash in hand'}), }
+
+
+class SaleReportFilterForm(forms.Form):
+    customer = forms.ModelChoiceField(queryset=Customer.objects.all(), required=False, label='Customer', blank=True,
+                                      widget=forms.Select({'class': 'form-control'}))
+    user = forms.ModelChoiceField(queryset=User.objects.all(), required=False, label='User', blank=True,
+                                  widget=forms.Select({'class': 'form-control'}))
+    start_date = forms.DateTimeField(widget=forms.DateTimeInput({'class': 'form-control', 'type': 'datetime-local'}))
+    end_date = forms.DateTimeField(widget=forms.DateTimeInput({'class': 'form-control', 'type': 'datetime-local'}))
+
+
+PAYMENT_CHOICES = [(None, ('----------')), ('Ca', 'Cash'), ('Ch', 'Cheque'), ('Cd', 'Card'), ('Ep', 'Easy-Paisa'), ]
+
+
+class PaymentReportFilterForm(forms.Form):
+    payment_reference = forms.CharField(max_length=250, required=False, label='Payment Reference',
+                                        widget=forms.TextInput({'class': 'form-control'}))
+    sale_no = forms.IntegerField(required=False, label='Sale No', widget=forms.NumberInput({'class': 'form-control'}))
+    customer = forms.ModelChoiceField(queryset=Customer.objects.all(), required=False, label='Customer', blank=True,
+                                      widget=forms.Select({'class': 'form-control'}))
+    created_by = forms.ModelChoiceField(queryset=User.objects.all(), required=False, label='Created By', blank=True,
+                                        widget=forms.Select({'class': 'form-control'}))
+    paid_by = forms.ChoiceField(choices=PAYMENT_CHOICES, required=False, label='Paid By',
+                                widget=forms.Select({'class': 'form-control'}))
+    start_date = forms.DateTimeField(widget=forms.DateTimeInput({'class': 'form-control', 'type': 'datetime-local'}))
+    end_date = forms.DateTimeField(widget=forms.DateTimeInput({'class': 'form-control', 'type': 'datetime-local'}))
+
+
+class RegistersReportFilterForm(forms.Form):
+    user = forms.ModelChoiceField(queryset=User.objects.all(), required=False, label='User', blank=True,
+                                  widget=forms.Select({'class': 'form-control'}))
+    start_date = forms.DateTimeField(widget=forms.DateTimeInput({'class': 'form-control', 'type': 'datetime-local'}))
+    end_date = forms.DateTimeField(widget=forms.DateTimeInput({'class': 'form-control', 'type': 'datetime-local'}))
+
+
+class ProductsReportFilterForm(forms.Form):
+    products = forms.ModelChoiceField(queryset=Product.objects.all(), required=False, label='Product', blank=True,
+                                  widget=forms.Select({'class': 'form-control'}))
+    start_date = forms.DateTimeField(widget=forms.DateTimeInput({'class': 'form-control', 'type': 'datetime-local'}))
+    end_date = forms.DateTimeField(widget=forms.DateTimeInput({'class': 'form-control', 'type': 'datetime-local'}))

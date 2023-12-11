@@ -20,12 +20,12 @@
                         <div class="x_content products_content">
                             <br/>
                             <div class="row">
-                                {% for product in products %}
+                                {% for storeproduct in storeproducts %}
                                 <div class="col-md-55">
                                     <div class="thumbnail">
                                         <div class="view-first py-0 mb-0">
-                                            {% if product.image.url %}
-                                                <a class="product" href="#" data-pid="{{ product.id }}" data-sid="{{ sale.saleitems.id }}" data-url="{% url 'create-sale-product' product.id %}" data-user="{{ user.id }}" data-register_id="{{ register.id }}"><img style="width: 100%; display: block; height: 100px" src="{{product.image.url}}"
+                                            {% if storeproduct.product.image.url %}
+                                                <a class="product" href="#" data-pid="{{ storeproduct.product.id }}" data-sid="{{ sale.saleitems.id }}" data-url="{% url 'create-sale-product' storeproduct.product.id %}" data-user="{{ user.id }}" data-register_id="{{ register.id }}"><img style="width: 100%; display: block; height: 100px" src="{{storeproduct.product.image.url}}"
                                                  alt="image"/></a>
                                             {% else %}
                                                 <img style="width: 100%; display: block;" src="#"
@@ -33,7 +33,7 @@
                                             {% endif %}
                                         </div>
                                         <div class="caption text-center">
-                                            <p>{{ product.name}}</p>
+                                            <p>{{ storeproduct.product.name}}</p>
                                         </div>
                                     </div>
                                 </div>

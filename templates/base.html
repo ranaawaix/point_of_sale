@@ -79,7 +79,7 @@
                                 </li>
                             {% endif %}
                             {% if reg %}
-                                <li><a href="{% url 'create-sale' reg.id %}"><i class="fa fa-th"></i> POS </a>
+                                <li><a href="{% url 'create-sale' reg.id reg.store.id %}"><i class="fa fa-th"></i> POS </a>
                                 </li>
                             {% endif %}
                             <li><a><i class="fa fa-barcode"></i> Products <span class="fa fa-chevron-down"></span></a>
@@ -232,7 +232,7 @@
                                 style="position: absolute; will-change: transform; top: 0; left: 0; transform: translate3d(-141px, 16px, 0px);">
                                 {% for notification in notifications %}
                                     <li class="nav-item">
-                                        <a class="dropdown-item" href="{% url 'update-sale' notification.id %}">
+                                        <a class="dropdown-item" href="{% url 'update-sale' notification.id reg.store.id %}">
                                             <span class="image"><img src="#" alt="Profile Image"></span>
                                             <span>
                             <span>{{ user.username|capfirst }}</span>
@@ -255,7 +255,7 @@
                             </ul>
                         </li>
                         {% if reg %}
-                            <li><a class="px-4" href="{% url 'create-sale' reg.id %}" data-toggle="tooltip" title="POS"><i
+                            <li><a class="px-4" href="{% url 'create-sale' reg.id reg.store.id %}" data-toggle="tooltip" title="POS"><i
                                     class="fa fa-th"></i> </a>
                             </li>
                         {% endif %}
@@ -264,7 +264,7 @@
                         <li><a href="" data-toggle="tooltip" title="Settings"><i
                                 class="fa fa-cogs"></i></a>
                         </li>
-                        <li><a class="px-4" data-toggle="tooltip" title="Dashboard"><i class="fa fa-dashboard"></i></a>
+                        <li><a class="px-4" href="{% url 'dashboard' %}" data-toggle="tooltip" title="Dashboard"><i class="fa fa-dashboard"></i></a>
                         </li>
                         <li class="hidden-xs hidden-sm px-4" id="datetime"><a href="" class="clock">{{ datetime }}</a>
                         </li>

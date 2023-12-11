@@ -9,19 +9,20 @@ from inventory.forms import AddCategoriesForm, AddPurchaseOrderForm, PurchaseOrd
     AddSupplierForm
 from inventory.models import Category, PurchaseOrder, PurchaseOrderItem, Supplier, Expense
 from user_accounts.models import User
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 # Create your views here.
 
 
-class ListCategoriesView(ListView):
+class ListCategoriesView(LoginRequiredMixin, ListView):
     model = Category
     template_name = 'inventory/list_categories.html'
     context_object_name = 'categories'
     paginate_by = 5
 
 
-class AddCategory(CreateView):
+class AddCategory(LoginRequiredMixin, CreateView):
     model = Category
     form_class = AddCategoriesForm
     template_name = 'inventory/add_category.html'
@@ -38,20 +39,20 @@ class AddCategory(CreateView):
         return redirect(self.success_url)
 
 
-class UpdateCategoryView(UpdateView):
+class UpdateCategoryView(LoginRequiredMixin, UpdateView):
     model = Category
     form_class = AddCategoriesForm
     template_name = 'inventory/update_category.html'
     success_url = reverse_lazy('list-categories')
 
 
-class DeleteCategoryView(DeleteView):
+class DeleteCategoryView(LoginRequiredMixin, DeleteView):
     model = Category
     template_name = 'inventory/confirm_delete.html'
     success_url = reverse_lazy('list-categories')
 
 
-class AddPurchaseView(CreateView):
+class AddPurchaseView(LoginRequiredMixin, CreateView):
     model = PurchaseOrder
     form_class = AddPurchaseOrderForm
     template_name = 'inventory/add_purchase.html'
@@ -87,7 +88,7 @@ class AddPurchaseView(CreateView):
         return redirect('list-categories')
 
 
-class AddPurchaseOrderItemView(TemplateView):
+class AddPurchaseOrderItemView(LoginRequiredMixin, TemplateView):
     template_name = 'inventory/includes/purchase_item_include.html'
 
     def post(self, request, *args, **kwargs):
@@ -109,7 +110,7 @@ class AddPurchaseOrderItemView(TemplateView):
         return self.render_to_response(context)
 
 
-class EditPurchaseOrderItem(TemplateView):
+class EditPurchaseOrderItem(LoginRequiredMixin, TemplateView):
     template_name = 'inventory/includes/purchase_item_include.html'
 
     def post(self, request, *args, **kwargs):
@@ -131,7 +132,7 @@ class EditPurchaseOrderItem(TemplateView):
         return self.render_to_response(context)
 
 
-class DeletePurchaseItem(DeletionMixin, TemplateView):
+class DeletePurchaseItem(LoginRequiredMixin, DeletionMixin, TemplateView):
     template_name = 'inventory/includes/purchase_item_include.html'
     success_url = reverse_lazy('add-purchase-order')
 
@@ -153,7 +154,7 @@ class DeletePurchaseItem(DeletionMixin, TemplateView):
         return self.render_to_response(context)
 
 
-class UpdatePurchaseOrderView(UpdateView):
+class UpdatePurchaseOrderView(LoginRequiredMixin, UpdateView):
     model = PurchaseOrder
     form_class = AddPurchaseOrderForm
     template_name = 'inventory/update_purchase.html'
@@ -177,20 +178,20 @@ class UpdatePurchaseOrderView(UpdateView):
         return context
 
 
-class DeletePurchaseOrderView(DeleteView):
+class DeletePurchaseOrderView(LoginRequiredMixin, DeleteView):
     model = PurchaseOrder
     template_name = 'inventory/confirm_delete_purchase.html'
     success_url = reverse_lazy('list-purchase-orders')
 
 
-class PurchaseOrderListView(ListView):
+class PurchaseOrderListView(LoginRequiredMixin, ListView):
     model = PurchaseOrder
     template_name = 'inventory/list_purchase_orders.html'
     context_object_name = 'purchase_orders'
     paginate_by = 5
 
 
-class AddExpenseView(CreateView):
+class AddExpenseView(LoginRequiredMixin, CreateView):
     model = Expense
     form_class = AddExpenseForm
     template_name = 'inventory/add_expense.html'
@@ -208,26 +209,26 @@ class AddExpenseView(CreateView):
         return redirect('list-expenses')
 
 
-class ListExpensesView(ListView):
+class ListExpensesView(LoginRequiredMixin, ListView):
     model = Expense
     template_name = 'inventory/list_expenses.html'
     context_object_name = 'expenses'
     paginate_by = 5
 
 
-class EditExpense(UpdateView):
+class EditExpense(LoginRequiredMixin, UpdateView):
     model = Expense
     form_class = AddExpenseForm
     template_name = 'inventory/update_expense.html'
 
 
-class DeleteExpense(DeleteView):
+class DeleteExpense(LoginRequiredMixin, DeleteView):
     model = Expense
     template_name = 'inventory/confirm_delete_expense.html'
     success_url = reverse_lazy('list-expenses')
 
 
-class AddSuplierView(CreateView):
+class AddSuplierView(LoginRequiredMixin, CreateView):
     model = Supplier
     form_class = AddSupplierForm
     template_name = 'inventory/add_supplier.html'
@@ -246,19 +247,19 @@ class AddSuplierView(CreateView):
         return redirect(reverse_lazy('list-suppliers'))
 
 
-class SupplierListView(ListView):
+class SupplierListView(LoginRequiredMixin, ListView):
     model = Supplier
     template_name = 'inventory/list_suppliers.html'
     context_object_name = 'suppliers'
     paginate_by = 5
 
 
-class UpdateSupplierView(UpdateView):
+class UpdateSupplierView(LoginRequiredMixin, UpdateView):
     model = Supplier
     form_class = AddSupplierForm
     template_name = 'inventory/update_supplier.html'
 
 
-class DeleteSupplierView(DeleteView):
+class DeleteSupplierView(LoginRequiredMixin, DeleteView):
     model = Supplier
     template_name = 'inventory/confirm_delete_supplier.html'

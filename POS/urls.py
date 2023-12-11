@@ -3,9 +3,9 @@ from POS import views
 
 urlpatterns = [
     path('stores', views.StoreListView.as_view(), name='stores'),
-    path('create_sale_register/<int:register_id>', views.POS.as_view(), name='create-sale'),
+    path('create_sale_register/<int:register_id>/<int:store_id>', views.POS.as_view(), name='create-sale'),
     path('update_sale_item/', views.SaleItemUpdateView.as_view(), name='update-sale-item'),
-    path('update_sale/<int:pk>', views.POSUpdateView.as_view(), name='update-sale'),
+    path('update_sale/<int:pk>/<int:store_id>', views.POSUpdateView.as_view(), name='update-sale'),
     path('delete_sale/<int:pk>', views.POSDeleteView.as_view(), name='delete-sale'),
     path('create_customer', views.AddCustomerView.as_view(), name='create-customer'),
     path('create_payment', views.PaymentView.as_view(), name='create-payment'),

@@ -24,7 +24,7 @@ urlpatterns = [
     path('users/', include('user_accounts.urls')),
     path('pos/', include('POS.urls')),
     path('inventory/', include('inventory.urls')),
-    path('dashboard', DashboardView.as_view(), name='dashboard'),
+    path('', DashboardView.as_view(), name='dashboard'),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

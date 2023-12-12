@@ -257,7 +257,8 @@ class ProductListView(LoginRequiredMixin, StaffAdminRequiredMixin, ListView):
         return context
 
 
-class StoreWiseProductListView(LoginRequiredMixin, MultipleObjectTemplateResponseMixin, MultipleObjectMixin, StaffAdminRequiredMixin, View):
+class StoreWiseProductListView(LoginRequiredMixin, MultipleObjectTemplateResponseMixin, MultipleObjectMixin,
+                               StaffAdminRequiredMixin, View):
     model = StoreProduct
     template_name = 'POS/list_products.html'
     paginate_by = 5
@@ -471,7 +472,7 @@ class DashboardView(LoginRequiredMixin, StaffAdminRequiredMixin, TemplateView):
         display = f'{current_month_name} - {current_year_name}'
         context['month'] = {'display': display}
         products = SaleItem.objects.filter(created_at__month=datetime.datetime.now().month).values(
-            'product__name').annotate(total_quantity=Sum('quantity')).order_by('-total_quantity')[:5]
+            'product__name').annotate(total_quantity=Sum('quantity')).order_by('-total_quantity')[:10]
         context['products'] = products
         return context
 
@@ -542,10 +543,8 @@ class MonthlyReportView(LoginRequiredMixin, AdminRequiredMixin, TemplateView):
         expense_count = Expense.objects.filter(date__month=datetime.datetime.today().month).count()
         context['expense_value'] = expense_value
         context['expense_count'] = expense_count
-        today_cost = \
-            SaleItem.objects.filter(updated_at__month=datetime.datetime.today().month).values(
-                'product__cost').aggregate(
-                Sum('product__cost'))['product__cost__sum']
+        today_cost = SaleItem.objects.filter(updated_at__month=datetime.datetime.today().month).values(
+            'product__cost').aggregate(Sum('product__cost'))['product__cost__sum']
         if not today_cost:
             today_cost = 0
         profit = sales_value - (today_cost + purchase_value + expense_value)
@@ -565,7 +564,8 @@ class SalesReportView(LoginRequiredMixin, AdminRequiredMixin, ListView):
         return context
 
 
-class FilterSalesReportView(LoginRequiredMixin, AdminRequiredMixin, MultipleObjectTemplateResponseMixin, MultipleObjectMixin, View):
+class FilterSalesReportView(LoginRequiredMixin, AdminRequiredMixin, MultipleObjectTemplateResponseMixin,
+                            MultipleObjectMixin, View):
     model = Sale
     template_name = 'POS/sales_report.html'
     paginate_by = 5
@@ -605,7 +605,8 @@ class PaymentReportView(LoginRequiredMixin, AdminRequiredMixin, ListView):
         return context
 
 
-class FilterPaymentsReportView(LoginRequiredMixin, AdminRequiredMixin, MultipleObjectTemplateResponseMixin, MultipleObjectMixin, View):
+class FilterPaymentsReportView(LoginRequiredMixin, AdminRequiredMixin, MultipleObjectTemplateResponseMixin,
+                               MultipleObjectMixin, View):
     model = Payment
     template_name = 'POS/payment_report.html'
     paginate_by = 5
@@ -654,7 +655,8 @@ class RegisterReportView(LoginRequiredMixin, AdminRequiredMixin, ListView):
         return context
 
 
-class FilterRegistersReportView(LoginRequiredMixin, AdminRequiredMixin, MultipleObjectTemplateResponseMixin, MultipleObjectMixin, View):
+class FilterRegistersReportView(LoginRequiredMixin, AdminRequiredMixin, MultipleObjectTemplateResponseMixin,
+                                MultipleObjectMixin, View):
     model = Register
     template_name = 'POS/registers_report.html'
     paginate_by = 5
@@ -740,7 +742,8 @@ class TopProductsReportView(LoginRequiredMixin, AdminRequiredMixin, ListView):
         return context
 
 
-class FilterProductsReportView(LoginRequiredMixin, AdminRequiredMixin, MultipleObjectTemplateResponseMixin, MultipleObjectMixin, View):
+class FilterProductsReportView(LoginRequiredMixin, AdminRequiredMixin, MultipleObjectTemplateResponseMixin,
+                               MultipleObjectMixin, View):
     model = SaleItem
     template_name = 'POS/top_products_report.html'
     paginate_by = 5

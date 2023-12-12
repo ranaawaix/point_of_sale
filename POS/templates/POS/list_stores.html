@@ -38,6 +38,20 @@
                             <div class="clearfix"></div>
                         </div>
                         <div class="x_content">
+                            {% if messages %}
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="messages">
+                                            <ul class="messages text-center">
+                                                {% for message in messages %}
+                                                    <li{% if message.tags %}
+                                                        class="alert-{{ message.tags }}"{% endif %}>{{ message }}</li>
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
                             <div class="row">
                                 <div class="col-sm-12">
                                     <div class="card-box table-responsive">

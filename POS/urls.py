@@ -38,4 +38,6 @@ urlpatterns = [
     path('top_products', views.TopProductsView.as_view(), name='top-products'),
     path('top_products_report', views.TopProductsReportView.as_view(), name='top-products-report'),
     path('top_products_filter', views.FilterProductsReportView.as_view(), name='top-products-filter'),
+    path('customer_screen', views.CustomerScreenView.as_view(), name='customer-screen'),
+    path('customer_screen_update', views.CustomerScreenUpdateView.as_view(), name='customer-screen-update'),
 ]

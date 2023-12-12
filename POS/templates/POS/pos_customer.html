@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+    POS
+{% endblock %}
+{% block content %}
+    <!-- page content -->
+    <div class="right_col" role="main">
+        <div class="">
+            <div class="clearfix"></div>
+            <div class="row">
+                <div class="col-md-4 col-sm-12">
+                    <!-- form input mask -->
+                    <div class="billing">
+                        {% include 'includes/pos_customer_include.html' %}
+                    </div>
+                </div>
+                <div class="col-md-8 col-sm-12">
+                    <div class="x_panel products_panel min-vh-100">
+                        <div class="x_content products_content">
+                            <br/>
+                            <div class="site-wrapper">
+                                <div class="site-wrapper-inner">
+                                    <div class="cover-container">
+                                        <div class="masthead clearfix">
+                                            <div class="inner">
+                                                <h3 class="text-center">SimplePOS</h3>
+                                            </div>
+                                        </div>
+                                        <div class="inner cover">
+                                            <h1 class="cover-heading text-center">Thank you for your visit!!!</h1>
+                                            <p class="lead text-center">Please come again.</p>
+                                            <p class="lead text-center">If you are happy with our services, please tell to your
+                                                friends otherwise let us know so that we can improve.</p>
+
+                                        </div>
+                                        <div class="mastfoot">
+                                            <div class="inner">
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /page content -->
+{% endblock %}
+{% block scripts %}
+    <script>
+        function fetchData() {
+            $.ajax({
+                type: 'GET',
+                url: '{% url 'customer-screen-update' %}',
+                success: function (response) {
+                    console.log(response);
+                    $('.billing').empty().append(response); // Replace the content of .billing
+                    setTimeout(fetchData, 1000); // Make the next AJAX request after 5 seconds
+                },
+                error: function (xhr, status, error) {
+                    console.error(status + ": " + error);
+                    setTimeout(fetchData, 1000); // If there's an error, retry after 5 seconds
+                }
+            });
+        }
+
+        $(document).ready(function () {
+            fetchData(); // Start fetching data on page load
+        });
+    </script>
+{% endblock %}

@@ -20,12 +20,13 @@ from POS.models import Store, StoreProduct
 from inventory.models import Product, PurchaseOrder, Expense
 from user_accounts.models import User
 from django.contrib.auth.mixins import LoginRequiredMixin
+from user_accounts.mixins import AdminRequiredMixin, StaffAdminRequiredMixin, StoreRequiredMixin
 
 
 # Create your views here.
 
 
-class StoreListView(LoginRequiredMixin, ListView):
+class StoreListView(LoginRequiredMixin, StaffAdminRequiredMixin, ListView):
     model = Store
     template_name = 'POS/list_stores.html'
     context_object_name = 'stores'
@@ -40,7 +41,7 @@ class StoreListView(LoginRequiredMixin, ListView):
         return self.queryset
 
 
-class POS(LoginRequiredMixin, CreateView):
+class POS(LoginRequiredMixin, StaffAdminRequiredMixin, StoreRequiredMixin, CreateView):
     model = Sale
     form_class = SaleForm
     template_name = 'POS/pos.html'
@@ -68,8 +69,7 @@ class POS(LoginRequiredMixin, CreateView):
             return redirect(reverse_lazy('cash-in-hand'))
 
 
-class SaleView(LoginRequiredMixin, TemplateView):
-    template_name = 'includes/pos_include.html'
+class SaleView(LoginRequiredMixin, StaffAdminRequiredMixin, TemplateView):
 
     def post(self, request, prod_id):
         sale_id = self.request.POST.get('sale_id')
@@ -82,8 +82,11 @@ class SaleView(LoginRequiredMixin, TemplateView):
                'customerform': AddCustomerForm(request.POST), 'paymentform': PaymentForm(request.POST)})
         return self.render_to_response(context)
 
+    def get_template_names(self):
+        return ['includes/pos_include.html', 'includes/pos_customer_include.html']
 
-class SaleItemUpdateView(LoginRequiredMixin, TemplateView):
+
+class SaleItemUpdateView(LoginRequiredMixin, StaffAdminRequiredMixin, TemplateView):
     template_name = 'includes/pos_include.html'
 
     def post(self, request, *args, **kwargs):
@@ -99,7 +102,7 @@ class SaleItemUpdateView(LoginRequiredMixin, TemplateView):
         return self.render_to_response(context)
 
 
-class HoldOrderView(LoginRequiredMixin, CreateView):
+class HoldOrderView(LoginRequiredMixin, StaffAdminRequiredMixin, CreateView):
     model = Hold
     form_class = HoldOrderForm
     success_url = reverse_lazy('list-opened-bills')
@@ -118,7 +121,7 @@ class HoldOrderView(LoginRequiredMixin, CreateView):
             return JsonResponse({'status': 0})
 
 
-class AddCustomerView(LoginRequiredMixin, CreateView):
+class AddCustomerView(LoginRequiredMixin, StaffAdminRequiredMixin, CreateView):
     model = Customer
     form_class = AddCustomerForm
 
@@ -143,7 +146,7 @@ class AddCustomerView(LoginRequiredMixin, CreateView):
             return JsonResponse({'status': 0})
 
 
-class PaymentView(LoginRequiredMixin, CreateView):
+class PaymentView(LoginRequiredMixin, StaffAdminRequiredMixin, CreateView):
     model = Payment
     form_class = PaymentForm
     success_url = reverse_lazy('list-sales')
@@ -165,7 +168,7 @@ class PaymentView(LoginRequiredMixin, CreateView):
             return JsonResponse({'status': 0})
 
 
-class DeleteSaleItemView(LoginRequiredMixin, TemplateView):
+class DeleteSaleItemView(LoginRequiredMixin, StaffAdminRequiredMixin, TemplateView):
     template_name = 'includes/pos_include.html'
 
     def post(self, request, *args, **kwargs):
@@ -186,7 +189,7 @@ class DeleteSaleItemView(LoginRequiredMixin, TemplateView):
             return self.render_to_response(context)
 
 
-class AddStoreView(LoginRequiredMixin, CreateView):
+class AddStoreView(LoginRequiredMixin, AdminRequiredMixin, CreateView):
     model = Store
     form_class = AddStoreForm
     template_name = 'POS/add_store.html'
@@ -215,34 +218,34 @@ class AddStoreView(LoginRequiredMixin, CreateView):
         return redirect(self.success_url)
 
 
-class AddCustomersView(LoginRequiredMixin, CreateView):
+class AddCustomersView(LoginRequiredMixin, StaffAdminRequiredMixin, CreateView):
     model = Customer
     form_class = AddCustomerForm
     template_name = 'POS/add_customer.html'
     success_url = reverse_lazy('list-customers')
 
 
-class ListCustomersView(LoginRequiredMixin, ListView):
+class ListCustomersView(LoginRequiredMixin, StaffAdminRequiredMixin, ListView):
     model = Customer
     template_name = 'POS/list_customers.html'
     context_object_name = 'customers'
     paginate_by = 5
 
 
-class UpdateCustomerView(LoginRequiredMixin, UpdateView):
+class UpdateCustomerView(LoginRequiredMixin, StaffAdminRequiredMixin, UpdateView):
     model = Customer
     form_class = AddCustomerForm
     template_name = 'POS/update_customer.html'
     success_url = reverse_lazy('list-customers')
 
 
-class DeleteCustomerView(LoginRequiredMixin, DeleteView):
+class DeleteCustomerView(LoginRequiredMixin, StaffAdminRequiredMixin, DeleteView):
     model = Customer
     template_name = 'POS/confirm_delete.html'
     success_url = reverse_lazy('list-customers')
 
 
-class ProductListView(LoginRequiredMixin, ListView):
+class ProductListView(LoginRequiredMixin, StaffAdminRequiredMixin, ListView):
     model = StoreProduct
     template_name = 'POS/list_products.html'
     context_object_name = 'storeproducts'
@@ -254,7 +257,7 @@ class ProductListView(LoginRequiredMixin, ListView):
         return context
 
 
-class StoreWiseProductListView(LoginRequiredMixin, MultipleObjectTemplateResponseMixin, MultipleObjectMixin, View):
+class StoreWiseProductListView(LoginRequiredMixin, MultipleObjectTemplateResponseMixin, MultipleObjectMixin, StaffAdminRequiredMixin, View):
     model = StoreProduct
     template_name = 'POS/list_products.html'
     paginate_by = 5
@@ -267,7 +270,7 @@ class StoreWiseProductListView(LoginRequiredMixin, MultipleObjectTemplateRespons
                       context={'stores': stores, 'store': store, 'storeproducts': self.queryset})
 
 
-class AddProductView(LoginRequiredMixin, CreateView):
+class AddProductView(LoginRequiredMixin, StaffAdminRequiredMixin, CreateView):
     model = Product
     form_class = AddProductForm
     template_name = 'POS/add_products.html'
@@ -311,7 +314,7 @@ class AddProductView(LoginRequiredMixin, CreateView):
             return self.render_to_response(self.get_context_data(form=form, formset=formset))
 
 
-class UpdateProductView(LoginRequiredMixin, UpdateView):
+class UpdateProductView(LoginRequiredMixin, StaffAdminRequiredMixin, UpdateView):
     model = Product
     form_class = AddProductForm
     template_name = 'POS/update_products.html'
@@ -344,13 +347,13 @@ class UpdateProductView(LoginRequiredMixin, UpdateView):
             return super().form_valid(form)
 
 
-class DeleteProductView(LoginRequiredMixin, DeleteView):
+class DeleteProductView(LoginRequiredMixin, StaffAdminRequiredMixin, DeleteView):
     model = Product
     template_name = 'POS/confirm_delete_product.html'
     success_url = reverse_lazy('list-products')
 
 
-class SaleListView(LoginRequiredMixin, ListView):
+class SaleListView(LoginRequiredMixin, StaffAdminRequiredMixin, ListView):
     model = Sale
     template_name = 'POS/list_sales.html'
     queryset = Sale.objects.filter(status='P')
@@ -358,7 +361,7 @@ class SaleListView(LoginRequiredMixin, ListView):
     paginate_by = 5
 
 
-class OpenedBillsView(LoginRequiredMixin, ListView):
+class OpenedBillsView(LoginRequiredMixin, StaffAdminRequiredMixin, ListView):
     model = Sale
     template_name = 'POS/list_opened_bills.html'
     queryset = Sale.objects.filter(status='H')
@@ -366,7 +369,7 @@ class OpenedBillsView(LoginRequiredMixin, ListView):
     paginate_by = 5
 
 
-class POSUpdateView(LoginRequiredMixin, UpdateView):
+class POSUpdateView(LoginRequiredMixin, StaffAdminRequiredMixin, StoreRequiredMixin, UpdateView):
     model = Sale
     form_class = SaleForm
     template_name = 'POS/pos.html'
@@ -384,13 +387,13 @@ class POSUpdateView(LoginRequiredMixin, UpdateView):
         return context
 
 
-class POSDeleteView(LoginRequiredMixin, DeleteView):
+class POSDeleteView(LoginRequiredMixin, StaffAdminRequiredMixin, DeleteView):
     model = Sale
     template_name = 'POS/confirm_delete_sale.html'
     success_url = reverse_lazy('list-opened-bills')
 
 
-class StoreSelectView(LoginRequiredMixin, SingleObjectMixin, View):
+class StoreSelectView(LoginRequiredMixin, StaffAdminRequiredMixin, SingleObjectMixin, View):
 
     def get(self, request, store_id):
         stores = Store.objects.all()
@@ -409,7 +412,7 @@ class StoreSelectView(LoginRequiredMixin, SingleObjectMixin, View):
             return render(request, template_name='POS/list_stores.html', context={'stores': stores})
 
 
-class CashInHandView(LoginRequiredMixin, CreateView):
+class CashInHandView(LoginRequiredMixin, StaffAdminRequiredMixin, CreateView):
     model = Register
     success_url = reverse_lazy('create-sale')
 
@@ -433,7 +436,7 @@ class CashInHandView(LoginRequiredMixin, CreateView):
                           context={'selected_store': register, 'form': form})
 
 
-class CloseRegisterView(LoginRequiredMixin, View):
+class CloseRegisterView(LoginRequiredMixin, StaffAdminRequiredMixin, View):
 
     def post(self, request):
         register_id = request.POST.get('register_id')
@@ -451,7 +454,7 @@ class CloseRegisterView(LoginRequiredMixin, View):
         return redirect('stores')
 
 
-class DashboardView(LoginRequiredMixin, TemplateView):
+class DashboardView(LoginRequiredMixin, StaffAdminRequiredMixin, TemplateView):
     template_name = 'dashboard.html'
 
     def get_context_data(self, **kwargs):
@@ -473,7 +476,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         return context
 
 
-class DailyReportView(LoginRequiredMixin, TemplateView):
+class DailyReportView(LoginRequiredMixin, AdminRequiredMixin, TemplateView):
     template_name = 'POS/daily_report.html'
 
     def get_context_data(self, **kwargs):
@@ -511,7 +514,7 @@ class DailyReportView(LoginRequiredMixin, TemplateView):
         return context
 
 
-class MonthlyReportView(LoginRequiredMixin, TemplateView):
+class MonthlyReportView(LoginRequiredMixin, AdminRequiredMixin, TemplateView):
     template_name = 'POS/monthly_report.html'
 
     def get_context_data(self, **kwargs):
@@ -550,7 +553,7 @@ class MonthlyReportView(LoginRequiredMixin, TemplateView):
         return context
 
 
-class SalesReportView(LoginRequiredMixin, ListView):
+class SalesReportView(LoginRequiredMixin, AdminRequiredMixin, ListView):
     model = Sale
     template_name = 'POS/sales_report.html'
     context_object_name = 'sales'
@@ -562,7 +565,7 @@ class SalesReportView(LoginRequiredMixin, ListView):
         return context
 
 
-class FilterSalesReportView(LoginRequiredMixin, MultipleObjectTemplateResponseMixin, MultipleObjectMixin, View):
+class FilterSalesReportView(LoginRequiredMixin, AdminRequiredMixin, MultipleObjectTemplateResponseMixin, MultipleObjectMixin, View):
     model = Sale
     template_name = 'POS/sales_report.html'
     paginate_by = 5
@@ -590,7 +593,7 @@ class FilterSalesReportView(LoginRequiredMixin, MultipleObjectTemplateResponseMi
                       context={'sales': sales, 'filter_form': SaleReportFilterForm(request.POST or None)})
 
 
-class PaymentReportView(LoginRequiredMixin, ListView):
+class PaymentReportView(LoginRequiredMixin, AdminRequiredMixin, ListView):
     model = Payment
     template_name = 'POS/payment_report.html'
     context_object_name = 'payments'
@@ -602,7 +605,7 @@ class PaymentReportView(LoginRequiredMixin, ListView):
         return context
 
 
-class FilterPaymentsReportView(LoginRequiredMixin, MultipleObjectTemplateResponseMixin, MultipleObjectMixin, View):
+class FilterPaymentsReportView(LoginRequiredMixin, AdminRequiredMixin, MultipleObjectTemplateResponseMixin, MultipleObjectMixin, View):
     model = Payment
     template_name = 'POS/payment_report.html'
     paginate_by = 5
@@ -639,7 +642,7 @@ class FilterPaymentsReportView(LoginRequiredMixin, MultipleObjectTemplateRespons
                       context={'payments': payments, 'filter_form': PaymentReportFilterForm(request.POST or None)})
 
 
-class RegisterReportView(LoginRequiredMixin, ListView):
+class RegisterReportView(LoginRequiredMixin, AdminRequiredMixin, ListView):
     model = Register
     template_name = 'POS/registers_report.html'
     context_object_name = 'registers'
@@ -651,7 +654,7 @@ class RegisterReportView(LoginRequiredMixin, ListView):
         return context
 
 
-class FilterRegistersReportView(LoginRequiredMixin, MultipleObjectTemplateResponseMixin, MultipleObjectMixin, View):
+class FilterRegistersReportView(LoginRequiredMixin, AdminRequiredMixin, MultipleObjectTemplateResponseMixin, MultipleObjectMixin, View):
     model = Register
     template_name = 'POS/registers_report.html'
     paginate_by = 5
@@ -675,7 +678,7 @@ class FilterRegistersReportView(LoginRequiredMixin, MultipleObjectTemplateRespon
                       context={'registers': registers, 'filter_form': RegistersReportFilterForm(request.POST or None)})
 
 
-class TopProductsView(LoginRequiredMixin, TemplateView):
+class TopProductsView(LoginRequiredMixin, AdminRequiredMixin, TemplateView):
     template_name = 'POS/top_products.html'
 
     def get_context_data(self, **kwargs):
@@ -721,7 +724,7 @@ class TopProductsView(LoginRequiredMixin, TemplateView):
         return context
 
 
-class TopProductsReportView(LoginRequiredMixin, ListView):
+class TopProductsReportView(LoginRequiredMixin, AdminRequiredMixin, ListView):
     model = SaleItem
     template_name = 'POS/top_products_report.html'
     context_object_name = 'sales'
@@ -737,7 +740,7 @@ class TopProductsReportView(LoginRequiredMixin, ListView):
         return context
 
 
-class FilterProductsReportView(LoginRequiredMixin, MultipleObjectTemplateResponseMixin, MultipleObjectMixin, View):
+class FilterProductsReportView(LoginRequiredMixin, AdminRequiredMixin, MultipleObjectTemplateResponseMixin, MultipleObjectMixin, View):
     model = SaleItem
     template_name = 'POS/top_products_report.html'
     paginate_by = 5
@@ -774,3 +777,22 @@ class FilterProductsReportView(LoginRequiredMixin, MultipleObjectTemplateRespons
             sales = sales
         return render(request, 'POS/top_products_report.html',
                       context={'sales': sales, 'filter_form': ProductsReportFilterForm(request.POST or None)})
+
+
+class CustomerScreenView(TemplateView):
+    template_name = 'POS/pos_customer.html'
+
+
+class CustomerScreenUpdateView(TemplateView):
+    template_name = 'includes/pos_customer_include.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        sale = Sale.objects.filter(user=user, status='H').first()
+        context['sale'] = sale
+        return context
+
+    def get(self, request, *args, **kwargs):
+        context = self.get_context_data()
+        return self.render_to_response(context)

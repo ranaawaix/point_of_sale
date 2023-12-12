@@ -10,19 +10,20 @@ from inventory.forms import AddCategoriesForm, AddPurchaseOrderForm, PurchaseOrd
 from inventory.models import Category, PurchaseOrder, PurchaseOrderItem, Supplier, Expense
 from user_accounts.models import User
 from django.contrib.auth.mixins import LoginRequiredMixin
+from user_accounts.mixins import AdminRequiredMixin, StaffAdminRequiredMixin
 
 
 # Create your views here.
 
 
-class ListCategoriesView(LoginRequiredMixin, ListView):
+class ListCategoriesView(LoginRequiredMixin, StaffAdminRequiredMixin , ListView):
     model = Category
     template_name = 'inventory/list_categories.html'
     context_object_name = 'categories'
     paginate_by = 5
 
 
-class AddCategory(LoginRequiredMixin, CreateView):
+class AddCategory(LoginRequiredMixin, StaffAdminRequiredMixin, CreateView):
     model = Category
     form_class = AddCategoriesForm
     template_name = 'inventory/add_category.html'
@@ -39,20 +40,20 @@ class AddCategory(LoginRequiredMixin, CreateView):
         return redirect(self.success_url)
 
 
-class UpdateCategoryView(LoginRequiredMixin, UpdateView):
+class UpdateCategoryView(LoginRequiredMixin, StaffAdminRequiredMixin, UpdateView):
     model = Category
     form_class = AddCategoriesForm
     template_name = 'inventory/update_category.html'
     success_url = reverse_lazy('list-categories')
 
 
-class DeleteCategoryView(LoginRequiredMixin, DeleteView):
+class DeleteCategoryView(LoginRequiredMixin, StaffAdminRequiredMixin, DeleteView):
     model = Category
     template_name = 'inventory/confirm_delete.html'
     success_url = reverse_lazy('list-categories')
 
 
-class AddPurchaseView(LoginRequiredMixin, CreateView):
+class AddPurchaseView(LoginRequiredMixin, AdminRequiredMixin, CreateView):
     model = PurchaseOrder
     form_class = AddPurchaseOrderForm
     template_name = 'inventory/add_purchase.html'
@@ -88,7 +89,7 @@ class AddPurchaseView(LoginRequiredMixin, CreateView):
         return redirect('list-categories')
 
 
-class AddPurchaseOrderItemView(LoginRequiredMixin, TemplateView):
+class AddPurchaseOrderItemView(LoginRequiredMixin, AdminRequiredMixin, TemplateView):
     template_name = 'inventory/includes/purchase_item_include.html'
 
     def post(self, request, *args, **kwargs):
@@ -110,7 +111,7 @@ class AddPurchaseOrderItemView(LoginRequiredMixin, TemplateView):
         return self.render_to_response(context)
 
 
-class EditPurchaseOrderItem(LoginRequiredMixin, TemplateView):
+class EditPurchaseOrderItem(LoginRequiredMixin, AdminRequiredMixin, TemplateView):
     template_name = 'inventory/includes/purchase_item_include.html'
 
     def post(self, request, *args, **kwargs):
@@ -132,7 +133,7 @@ class EditPurchaseOrderItem(LoginRequiredMixin, TemplateView):
         return self.render_to_response(context)
 
 
-class DeletePurchaseItem(LoginRequiredMixin, DeletionMixin, TemplateView):
+class DeletePurchaseItem(LoginRequiredMixin, DeletionMixin, AdminRequiredMixin, TemplateView):
     template_name = 'inventory/includes/purchase_item_include.html'
     success_url = reverse_lazy('add-purchase-order')
 
@@ -154,7 +155,7 @@ class DeletePurchaseItem(LoginRequiredMixin, DeletionMixin, TemplateView):
         return self.render_to_response(context)
 
 
-class UpdatePurchaseOrderView(LoginRequiredMixin, UpdateView):
+class UpdatePurchaseOrderView(LoginRequiredMixin, AdminRequiredMixin, UpdateView):
     model = PurchaseOrder
     form_class = AddPurchaseOrderForm
     template_name = 'inventory/update_purchase.html'
@@ -178,20 +179,20 @@ class UpdatePurchaseOrderView(LoginRequiredMixin, UpdateView):
         return context
 
 
-class DeletePurchaseOrderView(LoginRequiredMixin, DeleteView):
+class DeletePurchaseOrderView(LoginRequiredMixin, AdminRequiredMixin, DeleteView):
     model = PurchaseOrder
     template_name = 'inventory/confirm_delete_purchase.html'
     success_url = reverse_lazy('list-purchase-orders')
 
 
-class PurchaseOrderListView(LoginRequiredMixin, ListView):
+class PurchaseOrderListView(LoginRequiredMixin, AdminRequiredMixin, ListView):
     model = PurchaseOrder
     template_name = 'inventory/list_purchase_orders.html'
     context_object_name = 'purchase_orders'
     paginate_by = 5
 
 
-class AddExpenseView(LoginRequiredMixin, CreateView):
+class AddExpenseView(LoginRequiredMixin, StaffAdminRequiredMixin, CreateView):
     model = Expense
     form_class = AddExpenseForm
     template_name = 'inventory/add_expense.html'
@@ -209,26 +210,26 @@ class AddExpenseView(LoginRequiredMixin, CreateView):
         return redirect('list-expenses')
 
 
-class ListExpensesView(LoginRequiredMixin, ListView):
+class ListExpensesView(LoginRequiredMixin, StaffAdminRequiredMixin, ListView):
     model = Expense
     template_name = 'inventory/list_expenses.html'
     context_object_name = 'expenses'
     paginate_by = 5
 
 
-class EditExpense(LoginRequiredMixin, UpdateView):
+class EditExpense(LoginRequiredMixin, StaffAdminRequiredMixin, UpdateView):
     model = Expense
     form_class = AddExpenseForm
     template_name = 'inventory/update_expense.html'
 
 
-class DeleteExpense(LoginRequiredMixin, DeleteView):
+class DeleteExpense(LoginRequiredMixin, StaffAdminRequiredMixin, DeleteView):
     model = Expense
     template_name = 'inventory/confirm_delete_expense.html'
     success_url = reverse_lazy('list-expenses')
 
 
-class AddSuplierView(LoginRequiredMixin, CreateView):
+class AddSuplierView(LoginRequiredMixin, AdminRequiredMixin, CreateView):
     model = Supplier
     form_class = AddSupplierForm
     template_name = 'inventory/add_supplier.html'
@@ -247,19 +248,19 @@ class AddSuplierView(LoginRequiredMixin, CreateView):
         return redirect(reverse_lazy('list-suppliers'))
 
 
-class SupplierListView(LoginRequiredMixin, ListView):
+class SupplierListView(LoginRequiredMixin, AdminRequiredMixin, ListView):
     model = Supplier
     template_name = 'inventory/list_suppliers.html'
     context_object_name = 'suppliers'
     paginate_by = 5
 
 
-class UpdateSupplierView(LoginRequiredMixin, UpdateView):
+class UpdateSupplierView(LoginRequiredMixin, AdminRequiredMixin, UpdateView):
     model = Supplier
     form_class = AddSupplierForm
     template_name = 'inventory/update_supplier.html'
 
 
-class DeleteSupplierView(LoginRequiredMixin, DeleteView):
+class DeleteSupplierView(LoginRequiredMixin, AdminRequiredMixin, DeleteView):
     model = Supplier
     template_name = 'inventory/confirm_delete_supplier.html'

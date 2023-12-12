@@ -52,24 +52,31 @@
 {% endblock %}
 {% block scripts %}
     <script>
+    var flag = false;
         function fetchData() {
+            if (flag === true){
+                return
+            }
+            flag = true;
+
             $.ajax({
                 type: 'GET',
                 url: '{% url 'customer-screen-update' %}',
                 success: function (response) {
                     console.log(response);
                     $('.billing').empty().append(response); // Replace the content of .billing
-                    setTimeout(fetchData, 1000); // Make the next AJAX request after 5 seconds
                 },
                 error: function (xhr, status, error) {
                     console.error(status + ": " + error);
-                    setTimeout(fetchData, 1000); // If there's an error, retry after 5 seconds
+                },
+                complete: function (){
+                    flag = false
                 }
             });
         }
 
         $(document).ready(function () {
-            fetchData(); // Start fetching data on page load
+            window.setInterval(fetchData, 1000)
         });
     </script>
 {% endblock %}

@@ -16,7 +16,7 @@
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/venv" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.7 (point_of_sale)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.9 (point_of_sale)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="popper.js" level="application" />
     <orderEntry type="library" name="jquery-3.7.0" level="application" />
@@ -34,6 +34,12 @@
     <orderEntry type="library" name="jquery" level="application" />
     <orderEntry type="library" name="sweetalert2" level="application" />
     <orderEntry type="library" name="jquery-ajaxy" level="application" />
+    <orderEntry type="library" name="loader" level="application" />
+    <orderEntry type="library" name="bootstrap" level="application" />
+    <orderEntry type="library" name="jquery-ajaxy" level="application" />
+    <orderEntry type="library" name="jquery-migrate-3.4.0" level="application" />
+    <orderEntry type="library" name="jquery" level="application" />
+    <orderEntry type="library" name="sweetalert2" level="application" />
   </component>
   <component name="PyDocumentationSettings">
     <option name="format" value="PLAIN" />

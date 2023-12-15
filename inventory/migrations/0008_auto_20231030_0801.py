@@ -9,7 +9,7 @@ def create_initial_data(apps, schema_editor):
     Barcode = apps.get_model('inventory', 'Barcode')
     Category = apps.get_model('inventory', 'Category')
     type = ProductType.objects.get(name='adipiscing')
-    barcode = Barcode.objects.get(name='UPC')
+    barcode = Barcode.objects.filter(name='UPC').first()
     category = Category.objects.get(name='Carolina Selwood')
     print(f'{type}-{barcode}-{category}')
 

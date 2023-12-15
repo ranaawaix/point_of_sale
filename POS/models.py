@@ -68,7 +68,7 @@ class Sale(models.Model):
     discount = models.IntegerField(default=0)
     order_tax = models.IntegerField(null=True, blank=True, default=0)
     total_payable = models.IntegerField(null=True, blank=True, default=0)
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='sales', default=27)
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='sales', default=26)
     status = models.CharField(choices=SALE_STATUS_CHOICES, max_length=250, default='H')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

@@ -80,7 +80,7 @@
                                     <div class="box box-success">
                                         <div class="box-body mt-2">
                                             {% if reg %}
-                                                <a class="btn btn-app" href="{% url 'create-sale' reg.id %}">
+                                                <a class="btn btn-app" href="{% url 'create-sale' reg.id reg.store.id %}">
                                                     <i class="fa fa-th"></i> POS </a>
                                             {% endif %}
                                             <a class="btn btn-app" href="{% url 'list-products' %}">

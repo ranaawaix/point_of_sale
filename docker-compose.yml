@@ -1,0 +1,24 @@
+version: "3.9"
+services:
+  app:
+    build: .
+    volumes:
+      - .:/django
+    ports:
+      - 8000:8000
+    image: app:django
+    container_name: django_container
+    command: python manage.py runserver 0.0.0.0:8000
+    depends_on:
+      - db
+  db:
+    image: postgres
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    ports:
+      - 54320:5432
+    environment:
+      - POSTGRES_DB=POS
+      - POSTGRES_USER=Rana
+      - POSTGRES_PASSWORD=Raw@1994
+    container_name: postgres_db

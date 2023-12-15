@@ -376,9 +376,9 @@
 <!-- Javascript functions	-->
 <script>
     function hideshow() {
-        var password = document.getElementById("password1");
-        var slash = document.getElementById("slash");
-        var eye = document.getElementById("eye");
+        const password = document.getElementById("password1");
+        const slash = document.getElementById("slash");
+        const eye = document.getElementById("eye");
 
         if (password.type === 'password') {
             password.type = "text";
@@ -395,12 +395,12 @@
 <script>
     // initialize a validator instance from the "FormValidator" constructor.
     // A "<form>" element is optionally passed as an argument, but is not a must
-    var validator = new FormValidator({
+    const validator = new FormValidator({
         "events": ['blur', 'input', 'change']
     }, document.forms[0]);
     // on form "submit" event
     document.forms[0].onsubmit = function (e) {
-        var submit = true,
+        const submit = true,
             validatorResult = validator.checkAll(this);
         console.log(validatorResult);
         return !!validatorResult.valid;
@@ -420,11 +420,11 @@
 <script>
     $('#CloseRegister').on('click', function (e) {
         e.preventDefault()
-        var register_id = $('#CloseRegister').data('regid')
-        var url = $(this).data('url')
-        var rurl = $(this).data('rurl')
+        const register_id = $('#CloseRegister').data('regid');
+        const url = $(this).data('url');
+        const rurl = $(this).data('rurl');
         let csrf = $("input[name=csrfmiddlewaretoken]").val();
-        var my_data = {register_id: register_id, csrfmiddlewaretoken: csrf}
+        const my_data = {register_id: register_id, csrfmiddlewaretoken: csrf};
         console.log(my_data)
         $.ajax({
             url: url,

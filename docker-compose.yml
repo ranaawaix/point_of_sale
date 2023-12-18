@@ -16,7 +16,7 @@ services:
     volumes:
       - ./data/db:/var/lib/postgresql/data
     ports:
-      - 54320:5432
+      - 54322:5432
     environment:
       - POSTGRES_DB=POS
       - POSTGRES_USER=Rana

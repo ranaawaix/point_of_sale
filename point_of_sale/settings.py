@@ -39,12 +39,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'drf_yasg',
 
     'user_accounts',
     'inventory',
     'POS',
 
     'cities_light',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -85,14 +87,25 @@ WSGI_APPLICATION = 'point_of_sale.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
-
+# Docker Database
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'POS',
+#         'USER': 'Rana',
+#         'PASSWORD': 'Raw@1994',
+#         'HOST': 'db',
+#         'PORT': '5432',
+#     }
+# }
+# Local database
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'POS',
-        'USER': 'Rana',
+        'NAME': 'yourdbname',
+        'USER': 'ranaawais',
         'PASSWORD': 'Raw@1994',
-        'HOST': 'db',
+        'HOST': 'localhost',
         'PORT': '5432',
     }
 }
